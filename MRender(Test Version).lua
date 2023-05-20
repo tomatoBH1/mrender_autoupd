@@ -1,4 +1,4 @@
-script_version('2.7.1')
+script_version('2.7.2')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -116,14 +116,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
     while not isSampAvailable() do wait(100) end
     
 	local lastver = update():getLastVersion()
-    sampAddChatMessage('Скрипт загружен, версия: '..lastver, -1)
+    sampAddChatMessage('[MRender - PRO] {D5DEDD}Скрипт загружен, версия: '..lastver, 0xFF0000)
     if thisScript().version ~= lastver then
-        sampRegisterChatCommand('scriptupd', function()
-            update():download()
-        end)
-        sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), введите /scriptupd для обновления!', -1)
+        sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), скачайте обновление в IMGUI-окне', 0xFF0000)
     end
-    --sampAddChatMessage('[New Year(RENDER)] {D5DEDD}Всех с Новым годом! Всем добра.', 0xFF0000) -- на следующий нг)
     sampAddChatMessage('[MRender - PRO] {D5DEDD}Команда: /mrender ', 0xFF0000)
     sampAddChatMessage('[ФПС] {D5DEDD}Возможны лаги при использовании, решаю проблем', 0xFF0000)
 	sampRegisterChatCommand("mrender", function()
@@ -512,7 +508,7 @@ function imgui.OnDrawFrame()
 	imgui.Separator()
     if imgui.Button(u8'Кастомизация', imgui.ImVec2(135, 58)) then selected = 4 end
 	imgui.Separator()
-	if imgui.Button(u8'SOON!', imgui.ImVec2(135, 35)) then selected = 5 end
+	if imgui.Button(u8'Авто-обновление', imgui.ImVec2(135, 35)) then selected = 5 end
 	imgui.EndChild()
 	imgui.SameLine()
 	if selected == 1 then
@@ -591,6 +587,22 @@ function imgui.OnDrawFrame()
 		    mainIni.settings.combo2 = combo2.v
 			inicfg.save(mainIni, "MRender.ini")
 	    end
+		imgui.EndChild()
+	end
+	if selected == 5 then
+		imgui.BeginChild('##update', imgui.ImVec2(380, 340), true)
+		imgui.CenterText(u8'Авто-обновление')
+        imgui.Separator()
+		if imgui.Button(u8'Загрузить обновление', imgui.ImVec2(150,50)) then
+			local lastver = update():getLastVersion()
+            if thisScript().version ~= lastver then
+			sampAddChatMessage('[AUTOUPDATE] {D5DEDD}Доступно обновление! Скачиваю...',0xFF0000)
+            update():download()
+            end
+			if thisScript().version == lastver then
+                sampAddChatMessage('[AUTOUPDATE] {D5DEDD}У вас уже актуальная версия!',0xFF0000)
+			end
+		end
 		imgui.EndChild()
 	end
 	imgui.End()
