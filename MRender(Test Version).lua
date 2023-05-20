@@ -115,7 +115,14 @@ function main()
 if not isSampLoaded() or not isSampfuncsLoaded() then return end
     while not isSampAvailable() do wait(100) end
     
-    sampAddChatMessage("[MRender - PRO] {D5DEDD}Данная версия c кастомизацией. Версия: {01A0E9} 1.7.1", 0xFF0000)
+	local lastver = update():getLastVersion()
+    sampAddChatMessage('Скрипт загружен, версия: '..lastver, -1)
+    if thisScript().version ~= lastver then
+        sampRegisterChatCommand('scriptupd', function()
+            update():download()
+        end)
+        sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), введите /scriptupd для обновления!', -1)
+    end
     --sampAddChatMessage('[New Year(RENDER)] {D5DEDD}Всех с Новым годом! Всем добра.', 0xFF0000) -- на следующий нг)
     sampAddChatMessage('[MRender - PRO] {D5DEDD}Команда: /mrender ', 0xFF0000)
     sampAddChatMessage('[ФПС] {D5DEDD}Возможны лаги при использовании, решаю проблем', 0xFF0000)
