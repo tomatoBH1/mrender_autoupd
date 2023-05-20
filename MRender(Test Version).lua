@@ -117,11 +117,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
     
 	local lastver = update():getLastVersion()
     sampAddChatMessage('[MRender - PRO] {D5DEDD}Скрипт загружен, версия: '..lastver, 0xFF0000)
+	sampAddChatMessage('[MRender - PRO] {D5DEDD}Команда: /mrender ', 0xFF0000)
     if thisScript().version ~= lastver then
         sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), скачайте обновление в IMGUI-окне', 0xFF0000)
     end
-    sampAddChatMessage('[MRender - PRO] {D5DEDD}Команда: /mrender ', 0xFF0000)
-    sampAddChatMessage('[ФПС] {D5DEDD}Возможны лаги при использовании, решаю проблем', 0xFF0000)
 	sampRegisterChatCommand("mrender", function()
         main_window_state.v = not main_window_state.v
 
@@ -497,7 +496,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(550, 370), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.7.1(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.7.2(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 340), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 58)) then selected = 1 end
