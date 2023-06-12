@@ -1,4 +1,4 @@
-script_version('2.7.2')
+script_version('2.7.3')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -52,9 +52,6 @@ local mainIni = inicfg.load({
 	    rsem = false,
 	    rryda = false,
 	    rderevo = false,
-		rrom = false,
-		rdyblon = false,
-		rporox = false,
 		rdrevecina = false,
 		svoiobj1 = false,
 		svoiobj2 = false,
@@ -114,10 +111,10 @@ if not doesFileExist('moonloader/config/MRender.ini') then inicfg.save(mainIni, 
 function main()
 if not isSampLoaded() or not isSampfuncsLoaded() then return end
     while not isSampAvailable() do wait(100) end
-    
+
 	local lastver = update():getLastVersion()
-    sampAddChatMessage('[MRender - PRO] {D5DEDD}Скрипт загружен, версия: '..lastver, 0xFF0000)
-	sampAddChatMessage('[MRender - PRO] {D5DEDD}Команда: /mrender ', 0xFF0000)
+    sampAddChatMessage('[MRender] {D5DEDD}Скрипт загружен, версия: '..lastver, 0xFF0000)
+	sampAddChatMessage('[MRender] {D5DEDD}Команда: /mrender ', 0xFF0000)
     if thisScript().version ~= lastver then
         sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), скачайте обновление в IMGUI-окне', 0xFF0000)
     end
@@ -159,38 +156,46 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 		for k, v in pairs(getAllObjects()) do
 			local num = getObjectModel(v)
 			if isObjectOnScreen(v) and rklad.v then
-				if num == 1271 then
+				if num == 1271 then --1271
 					local res, px, py, pz = getObjectCoordinates(v)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
-					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Сундук', wX, wY , test2)
+					local myPosX, myPosY = convert3DCoordsToScreen(xp,yp,zp)
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Сундук\nДистанция: '..distance, wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
 			if isObjectOnScreen(v) and rsem.v then
 				if num == 859 then
 					local res, px, py, pz = getObjectCoordinates(v)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
-					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Семена', wX, wY , test2)
+					local myPosX, myPosY = convert3DCoordsToScreen(xp,yp,zp)
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Семена\nДистанция: '..distance, wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
             if isObjectOnScreen(v) and rryda.v then
 				if num == 854 then
 					local res, px, py, pz = getObjectCoordinates(v)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
-					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Руда', wX, wY , test2)
+					local myPosX, myPosY = convert3DCoordsToScreen(xp,yp,zp)
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Руда\nДистанция: '..distance, wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
             if isObjectOnScreen(v) and rolen.v then
 				if num == 19315 then
 					local res, px, py, pz = getObjectCoordinates(v)
-					local wX, wY = convert3DCoordsToScreen(px, py, pz)
-					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Олень', wX, wY , test2)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
+					local wX, wY, wZ = convert3DCoordsToScreen(px, py, pz)
+					local myPosX, myPosY = convert3DCoordsToScreen(xp,yp,zp)
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Олень\nДистанция: '..distance, wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
@@ -198,23 +203,16 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 		for id = 0, 2048 do
             local result = sampIs3dTextDefined( id )
             if result then
-                local text, color, posX, posY, posZ, distance, ignoreWalls, playerId, vehicleId = sampGet3dTextInfoById( id )
-				
+                local text, color, posX, posY, posZ, distance, ignoreWalls, playerId, vehicleId = sampGet3dTextInfoById(id)
                 if rzakladka.v and text:find("Закладка") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+                    local x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(posX, posY, posZ,x2,y2,z2))
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,' Закладка', wposX, wposY,test2)
-                    end
-                end
-				if rzakladka.v and text:find("Закладка") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderFontDrawText(font,' Закладка\nДистанция: '..distance, wposX, wposY,test2)
+						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
 				if rlen.v and text:find("Лён") then
@@ -224,14 +222,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     local resX, resY = getScreenResolution()
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
                         renderFontDrawText(font,text, wposX, wposY,test2)
-                    end
-                end
-				if rlen.v and text:find("Лён") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
 				if rhlopok.v and text:find("Хлопок") then
@@ -241,83 +232,18 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     local resX, resY = getScreenResolution()
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
                         renderFontDrawText(font,text, wposX, wposY,test2)
-                    end
-                end
-				if rhlopok.v and text:find("Хлопок") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
 				--деревья
-				if rderevo.v and text:find("Нажмите ALT, чтобы собрать плоды") then
+				if rderevo.v and text:find("Используйте: 'Действие', чтобы собрать плоды") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
                         renderFontDrawText(font,text, wposX, wposY,test2)
-                    end
-                end
-				if rderevo.v and text:find("Нажмите ALT, чтобы собрать плоды") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-				if rrom.v and text:find("Бутылка рома") then
-                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                    local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'Бутылка рома', wposX, wposY,test2)
-                    end
-                end
-				if rrom.v and text:find("Бутылка рома") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-				if rdyblon.v and text:find("Пиратский дублон") then
-                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                    local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'Пиратский дублон', wposX, wposY,test2)
-                    end
-                end
-				if rdyblon.v and text:find("Пиратский дублон") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-				if rdyblon.v and text:find("Ящик с порохом") then
-                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                    local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'Ящик с порохом', wposX, wposY,test2)
-                    end
-                end
-				if rdyblon.v and text:find("Ящик с порохом") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
 				if rdrevecina.v and text:find("Дерево высшего качества") then
@@ -325,38 +251,25 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(posX, posY, posZ,x2,y2,z2))
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'Дерево выс.качества', wposX, wposY,test2)
-                    end
-                end
-				if rdrevecina.v and text:find("Дерево высшего качества") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
+                        renderFontDrawText(font,'Дерево выс.качества\nДистанция: '..distance, wposX, wposY,test2)
+                        renderDrawLine(x10, y10, wposX, wposY, test1, test)
+					end
                 end
 
 				--банды
-				if rgrove.v and text:find("Grove Street") then
+				if rgrove.v and text:find("Grove Street") and text:find('Граффити') then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
                         renderFontDrawText(font,text, wposX, wposY,test2)
+						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if rgrove.v and text:find("Grove Street") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-				if rballas.v and text:find("East Side Ballas") then
+				if rballas.v and text:find("East Side Ballas") and text:find('Граффити') then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -366,15 +279,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if rballas.v and text:find("East Side Ballas") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-			    if rrifa.v and text:find("The Rifa") then
+			    if rrifa.v and text:find("The Rifa") and text:find('Граффити') then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -384,15 +289,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if rrifa.v and text:find("The Rifa") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-				 if raztec.v and text:find("Varrios Los Aztecas") then
+				 if raztec.v and text:find("Varrios Los Aztecas") and text:find('Граффити') then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -402,15 +299,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if raztec.v and text:find("Varrios Los Aztecas") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-				if rnw.v and text:find("Night Wolves") then
+				if rnw.v and text:find("Night Wolves") and text:find('Граффити') then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -420,15 +309,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if rnw.v and text:find("Night Wolves") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-				if rvagos.v and text:find("Los Santos Vagos") then
+				if rvagos.v and text:find("Los Santos Vagos") and text:find('Граффити') then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -436,14 +317,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
 						renderFontDrawText(font,text, wposX, wposY,test2)
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
-                    end
-                end
-				if rvagos.v and text:find("Los Santos Vagos") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
 				-------------------------------Свои obj-----------------------------------
@@ -457,14 +330,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if svoiobj1.v and text:find(u8:decode(nazvanie1.v)) then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
 				if svoiobj2.v and text:find(u8:decode(nazvanie2.v)) then 
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -473,14 +338,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
 						renderFontDrawText(font,text, wposX, wposY,test2)
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
-                    end
-                end
-				if svoiobj2.v and text:find(u8:decode(nazvanie2.v)) then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
 			end
@@ -496,7 +353,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(550, 370), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.7.2(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.7.3(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 340), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 58)) then selected = 1 end
@@ -535,11 +392,8 @@ function imgui.OnDrawFrame()
 		imgui.InputText(u8'##Название объекта для рендера №2', nazvanie2)
 		save1()
 		imgui.Separator()
-		imgui.CenterText(u8'Ивенты(День Труда 2023)')
+		imgui.CenterText(u8'Ивенты(nil invent)')
 		imgui.Separator()
-		imgui.Checkbox(u8"Бутылка рома", rrom)
-		imgui.Checkbox(u8"Пиратский дублон", rdyblon)
-		imgui.Checkbox(u8"Ящик с порохом", rporox)
 		save1()
 		imgui.EndChild()
 	end
@@ -690,9 +544,6 @@ function save1()
 	mainIni.ghetto.raztec =  raztec.v
 	mainIni.ghetto.rnw = rnw.v
 	mainIni.ghetto.rvagos =  rvagos.v
-	mainIni.render.rrom =  rrom.v
-	mainIni.render.rdyblon =  rdyblon.v
-	mainIni.render.rporox =  rporox.v
 	mainIni.render.rdrevecina =  rdrevecina.v
 	mainIni.render.svoiobj1 =  svoiobj1.v
 	mainIni.render.svoiobj2 =  svoiobj2.v
