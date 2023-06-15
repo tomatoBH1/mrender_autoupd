@@ -1,4 +1,4 @@
-script_version('2.7.3')
+script_version('1.7.3')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -86,11 +86,6 @@ local svoiobj1 = imgui.ImBool(mainIni.render.svoiobj1)
 local svoiobj2 = imgui.ImBool(mainIni.render.svoiobj2)
 local nazvanie1 = imgui.ImBuffer(mainIni.render.nazvanie1, 256)
 local nazvanie2 = imgui.ImBuffer(mainIni.render.nazvanie2, 256)
-
----------------------ивент-----------------------------
-local rrom = imgui.ImBool(mainIni.render.rrom)
-local rdyblon = imgui.ImBool(mainIni.render.rdyblon)
-local rporox = imgui.ImBool(mainIni.render.rporox)
 ------------------------------------------------------
 local rgrove = imgui.ImBool(mainIni.ghetto.rgrove)
 local rballas = imgui.ImBool(mainIni.ghetto.rballas)
