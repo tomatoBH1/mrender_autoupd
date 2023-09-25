@@ -1,4 +1,4 @@
-script_version('2.7.4')
+script_version('1.7.4')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -17,14 +17,14 @@ function update()
         local response = requests.get(raw)
         if response.status_code == 200 then
             downloadUrlToFile(decodeJson(response.text)['url'], thisScript().path, function (id, status, p1, p2)
-                print('Скачиваю '..decodeJson(response.text)['url']..' в '..thisScript().path)
+                print('Г‘ГЄГ Г·ГЁГўГ Гѕ '..decodeJson(response.text)['url']..' Гў '..thisScript().path)
                 if status == dlstatus.STATUSEX_ENDDOWNLOAD then
-                    sampAddChatMessage('Скрипт обновлен, перезагрузка...', -1)
+                    sampAddChatMessage('Г‘ГЄГ°ГЁГЇГІ Г®ГЎГ­Г®ГўГ«ГҐГ­, ГЇГҐГ°ГҐГ§Г ГЈГ°ГіГ§ГЄГ ...', -1)
                     thisScript():reload()
                 end
             end)
         else
-            sampAddChatMessage('Ошибка, невозможно установить обновление, код: '..response.status_code, -1)
+            sampAddChatMessage('ГЋГёГЁГЎГЄГ , Г­ГҐГўГ®Г§Г¬Г®Г¦Г­Г® ГіГ±ГІГ Г­Г®ГўГЁГІГј Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ, ГЄГ®Г¤: '..response.status_code, -1)
         end
     end
     return f
@@ -38,9 +38,9 @@ local encoding = require 'encoding'
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 local selected = 1
-local colors = {u8"Красный", u8"Оранжевый", u8"Желтый"}
+local colors = {u8"ГЉГ°Г Г±Г­Г»Г©", u8"ГЋГ°Г Г­Г¦ГҐГўГ»Г©", u8"Г†ГҐГ«ГІГ»Г©"}
 local width = {u8"1.0", u8"2.0", u8"3.0", u8"4.0"}
-local colorsobj = {u8"Белый", u8"Красный", u8"Оранжевый", u8"Желтый"}
+local colorsobj = {u8"ГЃГҐГ«Г»Г©", u8"ГЉГ°Г Г±Г­Г»Г©", u8"ГЋГ°Г Г­Г¦ГҐГўГ»Г©", u8"Г†ГҐГ«ГІГ»Г©"}
 
 local mainIni = inicfg.load({
 	render = {
@@ -58,8 +58,8 @@ local mainIni = inicfg.load({
 		rdrevecina = false,
 		svoiobj1 = false,
 		svoiobj2 = false,
-	    nazvanie1 = u8'Тестируем1',
-		nazvanie2 = u8'Тестируем2'
+	    nazvanie1 = u8'Г’ГҐГ±ГІГЁГ°ГіГҐГ¬1',
+		nazvanie2 = u8'Г’ГҐГ±ГІГЁГ°ГіГҐГ¬2'
     },
     ghetto = {
 	rgrove = false,
@@ -92,7 +92,7 @@ local nazvanie1 = imgui.ImBuffer(mainIni.render.nazvanie1, 256)
 local nazvanie2 = imgui.ImBuffer(mainIni.render.nazvanie2, 256)
 local nazvanie3 = imgui.ImBuffer(mainIni.settings.nazvanie3, 256)
 
----------------------ивент-----------------------------
+---------------------ГЁГўГҐГ­ГІ-----------------------------
 local rrom = imgui.ImBool(mainIni.render.rrom)
 local rdyblon = imgui.ImBool(mainIni.render.rdyblon)
 local rporox = imgui.ImBool(mainIni.render.rporox)
@@ -118,10 +118,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
     while not isSampAvailable() do wait(100) end
     
 	local lastver = update():getLastVersion()
-    sampAddChatMessage('[MRender - PRO] {D5DEDD}Скрипт загружен, версия: '..lastver, 0xFF0000)
-	sampAddChatMessage('[MRender - PRO] {D5DEDD}Команда: '..mainIni.settings.nazvanie3, 0xFF0000)
+    sampAddChatMessage('[MRender - PRO] {D5DEDD}Г‘ГЄГ°ГЁГЇГІ Г§Г ГЈГ°ГіГ¦ГҐГ­, ГўГҐГ°Г±ГЁГї: '..lastver, 0xFF0000)
+	sampAddChatMessage('[MRender - PRO] {D5DEDD}ГЉГ®Г¬Г Г­Г¤Г : '..mainIni.settings.nazvanie3, 0xFF0000)
     if thisScript().version ~= lastver then
-        sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), скачайте обновление в IMGUI-окне', 0xFF0000)
+        sampAddChatMessage('Г‚Г»ГёГ«Г® Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ Г±ГЄГ°ГЁГЇГІГ  ('..thisScript().version..' -> '..lastver..'), Г±ГЄГ Г·Г Г©ГІГҐ Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ Гў IMGUI-Г®ГЄГ­ГҐ', 0xFF0000)
     end
 	sampRegisterChatCommand('/ '..mainIni.settings.nazvanie3, function()
         main_window_state.v = not main_window_state.v
@@ -165,7 +165,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Сундук', wX, wY , test2)
+					renderFontDrawText(font, 'В Г‘ГіГ­Г¤ГіГЄ', wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
@@ -174,7 +174,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Семена', wX, wY , test2)
+					renderFontDrawText(font, 'В Г‘ГҐГ¬ГҐГ­Г ', wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
@@ -183,7 +183,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Руда', wX, wY , test2)
+					renderFontDrawText(font, 'В ГђГіГ¤Г ', wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
@@ -192,7 +192,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Олень', wX, wY , test2)
+					renderFontDrawText(font, 'В ГЋГ«ГҐГ­Гј', wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
@@ -202,16 +202,16 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
             if result then
                 local text, color, posX, posY, posZ, distance, ignoreWalls, playerId, vehicleId = sampGet3dTextInfoById( id )
 				
-                if rzakladka.v and text:find("Закладка") then
+                if rzakladka.v and text:find("Г‡Г ГЄГ«Г Г¤ГЄГ ") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,' Закладка', wposX, wposY,test2)
+                        renderFontDrawText(font,' Г‡Г ГЄГ«Г Г¤ГЄГ ', wposX, wposY,test2)
                     end
                 end
-				if rzakladka.v and text:find("Закладка") then 
+				if rzakladka.v and text:find("Г‡Г ГЄГ«Г Г¤ГЄГ ") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -219,7 +219,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				if rlen.v and text:find("Лён") then
+				if rlen.v and text:find("Г‹ВёГ­") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -228,7 +228,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderFontDrawText(font,text, wposX, wposY,test2)
                     end
                 end
-				if rlen.v and text:find("Лён") then 
+				if rlen.v and text:find("Г‹ВёГ­") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -236,7 +236,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				if rhlopok.v and text:find("Хлопок") then
+				if rhlopok.v and text:find("Г•Г«Г®ГЇГ®ГЄ") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -245,7 +245,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderFontDrawText(font,text, wposX, wposY,test2)
                     end
                 end
-				if rhlopok.v and text:find("Хлопок") then 
+				if rhlopok.v and text:find("Г•Г«Г®ГЇГ®ГЄ") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -253,8 +253,8 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				--деревья
-				if rderevo.v and text:find("Нажмите ALT, чтобы собрать плоды") then
+				--Г¤ГҐГ°ГҐГўГјГї
+				if rderevo.v and text:find("ГЌГ Г¦Г¬ГЁГІГҐ ALT, Г·ГІГ®ГЎГ» Г±Г®ГЎГ°Г ГІГј ГЇГ«Г®Г¤Г»") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -263,7 +263,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderFontDrawText(font,text, wposX, wposY,test2)
                     end
                 end
-				if rderevo.v and text:find("Нажмите ALT, чтобы собрать плоды") then 
+				if rderevo.v and text:find("ГЌГ Г¦Г¬ГЁГІГҐ ALT, Г·ГІГ®ГЎГ» Г±Г®ГЎГ°Г ГІГј ГЇГ«Г®Г¤Г»") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -271,16 +271,16 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				if rrom.v and text:find("Бутылка рома") then
+				if rrom.v and text:find("ГЃГіГІГ»Г«ГЄГ  Г°Г®Г¬Г ") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'Бутылка рома', wposX, wposY,test2)
+                        renderFontDrawText(font,'ГЃГіГІГ»Г«ГЄГ  Г°Г®Г¬Г ', wposX, wposY,test2)
                     end
                 end
-				if rrom.v and text:find("Бутылка рома") then 
+				if rrom.v and text:find("ГЃГіГІГ»Г«ГЄГ  Г°Г®Г¬Г ") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -288,16 +288,16 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				if rdyblon.v and text:find("Пиратский дублон") then
+				if rdyblon.v and text:find("ГЏГЁГ°Г ГІГ±ГЄГЁГ© Г¤ГіГЎГ«Г®Г­") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'Пиратский дублон', wposX, wposY,test2)
+                        renderFontDrawText(font,'ГЏГЁГ°Г ГІГ±ГЄГЁГ© Г¤ГіГЎГ«Г®Г­', wposX, wposY,test2)
                     end
                 end
-				if rdyblon.v and text:find("Пиратский дублон") then 
+				if rdyblon.v and text:find("ГЏГЁГ°Г ГІГ±ГЄГЁГ© Г¤ГіГЎГ«Г®Г­") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -305,16 +305,16 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				if rdyblon.v and text:find("Ящик с порохом") then
+				if rdyblon.v and text:find("ГџГ№ГЁГЄ Г± ГЇГ®Г°Г®ГµГ®Г¬") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'Ящик с порохом', wposX, wposY,test2)
+                        renderFontDrawText(font,'ГџГ№ГЁГЄ Г± ГЇГ®Г°Г®ГµГ®Г¬', wposX, wposY,test2)
                     end
                 end
-				if rdyblon.v and text:find("Ящик с порохом") then 
+				if rdyblon.v and text:find("ГџГ№ГЁГЄ Г± ГЇГ®Г°Г®ГµГ®Г¬") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -322,16 +322,16 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				if rdrevecina.v and text:find("Дерево высшего качества") then
+				if rdrevecina.v and text:find("Г„ГҐГ°ГҐГўГ® ГўГ»Г±ГёГҐГЈГ® ГЄГ Г·ГҐГ±ГІГўГ ") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'Дерево выс.качества', wposX, wposY,test2)
+                        renderFontDrawText(font,'Г„ГҐГ°ГҐГўГ® ГўГ»Г±.ГЄГ Г·ГҐГ±ГІГўГ ', wposX, wposY,test2)
                     end
                 end
-				if rdrevecina.v and text:find("Дерево высшего качества") then 
+				if rdrevecina.v and text:find("Г„ГҐГ°ГҐГўГ® ГўГ»Г±ГёГҐГЈГ® ГЄГ Г·ГҐГ±ГІГўГ ") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -340,7 +340,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     end
                 end
 
-				--банды
+				--ГЎГ Г­Г¤Г»
 				if rgrove.v and text:find("Grove Street") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -448,7 +448,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				-------------------------------Свои obj-----------------------------------
+				-------------------------------Г‘ГўГ®ГЁ obj-----------------------------------
 				if svoiobj1.v and text:find(u8:decode(nazvanie1.v)) then 
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -498,116 +498,116 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(550, 370), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.7.4(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.7.4(Г’ГҐГ±ГІГ®ГўГ Гї ГўГҐГ°Г±ГЁГї, Г± ГЄГ Г±ГІГ®Г¬ГЁГ§Г Г¶ГЁГҐГ©)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 340), true)
-	imgui.CenterText(u8'Меню')
-	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 58)) then selected = 1 end
+	imgui.CenterText(u8'ГЊГҐГ­Гѕ')
+	if imgui.Button(u8'ГђГҐГ­Г¤ГҐГ°', imgui.ImVec2(135, 58)) then selected = 1 end
 	imgui.Separator()
-	if imgui.Button(u8'Рендер граффити', imgui.ImVec2(135, 58)) then selected = 2 end
+	if imgui.Button(u8'ГђГҐГ­Г¤ГҐГ° ГЈГ°Г ГґГґГЁГІГЁ', imgui.ImVec2(135, 58)) then selected = 2 end
 	imgui.Separator()
-	if imgui.Button(u8'Информация', imgui.ImVec2(135, 58)) then selected = 3 end
+	if imgui.Button(u8'Г€Г­ГґГ®Г°Г¬Г Г¶ГЁГї', imgui.ImVec2(135, 58)) then selected = 3 end
 	imgui.Separator()
-    if imgui.Button(u8'Кастомизация', imgui.ImVec2(135, 58)) then selected = 4 end
+    if imgui.Button(u8'ГЉГ Г±ГІГ®Г¬ГЁГ§Г Г¶ГЁГї', imgui.ImVec2(135, 58)) then selected = 4 end
 	imgui.Separator()
-	if imgui.Button(u8'Авто-обновление', imgui.ImVec2(135, 35)) then selected = 5 end
+	if imgui.Button(u8'ГЂГўГІГ®-Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ', imgui.ImVec2(135, 35)) then selected = 5 end
 	imgui.EndChild()
 	imgui.SameLine()
 	if selected == 1 then
 		imgui.BeginChild('##render', imgui.ImVec2(380, 340), true)
-		imgui.CenterText(u8'Основное')
+		imgui.CenterText(u8'ГЋГ±Г­Г®ГўГ­Г®ГҐ')
 		imgui.Separator()
-		imgui.Checkbox(u8"Лен", rlen)
-		imgui.Checkbox(u8"Хлопок", rhlopok)
-		imgui.Checkbox(u8"Клады", rklad)
-		imgui.Checkbox(u8"Закладки", rzakladka)
-		imgui.Checkbox(u8"Семена", rsem)
-		imgui.Checkbox(u8"Олени", rolen)
-		imgui.Checkbox(u8"Руда", rryda)
-		imgui.Checkbox(u8"Деревья(плоды)", rderevo)
-		imgui.Checkbox(u8"Деревья высшего качества", rdrevecina)
+		imgui.Checkbox(u8"Г‹ГҐГ­", rlen)
+		imgui.Checkbox(u8"Г•Г«Г®ГЇГ®ГЄ", rhlopok)
+		imgui.Checkbox(u8"ГЉГ«Г Г¤Г»", rklad)
+		imgui.Checkbox(u8"Г‡Г ГЄГ«Г Г¤ГЄГЁ", rzakladka)
+		imgui.Checkbox(u8"Г‘ГҐГ¬ГҐГ­Г ", rsem)
+		imgui.Checkbox(u8"ГЋГ«ГҐГ­ГЁ", rolen)
+		imgui.Checkbox(u8"ГђГіГ¤Г ", rryda)
+		imgui.Checkbox(u8"Г„ГҐГ°ГҐГўГјГї(ГЇГ«Г®Г¤Г»)", rderevo)
+		imgui.Checkbox(u8"Г„ГҐГ°ГҐГўГјГї ГўГ»Г±ГёГҐГЈГ® ГЄГ Г·ГҐГ±ГІГўГ ", rdrevecina)
 		imgui.Separator()
-		imgui.CenterText(u8'Свои объекты')
-		imgui.Checkbox(u8"Свой объект №1", svoiobj1)
-		imgui.Text(u8'Название для obj №1')
+		imgui.CenterText(u8'Г‘ГўГ®ГЁ Г®ГЎГєГҐГЄГІГ»')
+		imgui.Checkbox(u8"Г‘ГўГ®Г© Г®ГЎГєГҐГЄГІ В№1", svoiobj1)
+		imgui.Text(u8'ГЌГ Г§ГўГ Г­ГЁГҐ Г¤Г«Гї obj В№1')
 		imgui.SameLine()
-		imgui.InputText(u8'##Название объекта для рендера №1', nazvanie1)
-		imgui.Checkbox(u8"Свой объект №2", svoiobj2)
-		imgui.Text(u8'Название для obj №2')
+		imgui.InputText(u8'##ГЌГ Г§ГўГ Г­ГЁГҐ Г®ГЎГєГҐГЄГІГ  Г¤Г«Гї Г°ГҐГ­Г¤ГҐГ°Г  В№1', nazvanie1)
+		imgui.Checkbox(u8"Г‘ГўГ®Г© Г®ГЎГєГҐГЄГІ В№2", svoiobj2)
+		imgui.Text(u8'ГЌГ Г§ГўГ Г­ГЁГҐ Г¤Г«Гї obj В№2')
 		imgui.SameLine()
-		imgui.InputText(u8'##Название объекта для рендера №2', nazvanie2)
+		imgui.InputText(u8'##ГЌГ Г§ГўГ Г­ГЁГҐ Г®ГЎГєГҐГЄГІГ  Г¤Г«Гї Г°ГҐГ­Г¤ГҐГ°Г  В№2', nazvanie2)
 		save1()
 		imgui.Separator()
-		imgui.CenterText(u8'Ивенты(День Труда 2023)')
+		imgui.CenterText(u8'Г€ГўГҐГ­ГІГ»(Г„ГҐГ­Гј Г’Г°ГіГ¤Г  2023)')
 		imgui.Separator()
-		imgui.Checkbox(u8"Бутылка рома", rrom)
-		imgui.Checkbox(u8"Пиратский дублон", rdyblon)
-		imgui.Checkbox(u8"Ящик с порохом", rporox)
+		imgui.Checkbox(u8"ГЃГіГІГ»Г«ГЄГ  Г°Г®Г¬Г ", rrom)
+		imgui.Checkbox(u8"ГЏГЁГ°Г ГІГ±ГЄГЁГ© Г¤ГіГЎГ«Г®Г­", rdyblon)
+		imgui.Checkbox(u8"ГџГ№ГЁГЄ Г± ГЇГ®Г°Г®ГµГ®Г¬", rporox)
 		save1()
 		imgui.EndChild()
 	end
 	if selected == 2 then
 		imgui.BeginChild('##getto', imgui.ImVec2(380, 340), true)
-		imgui.CenterText(u8'Рендер граффити')
+		imgui.CenterText(u8'ГђГҐГ­Г¤ГҐГ° ГЈГ°Г ГґГґГЁГІГЁ')
 		imgui.Separator()
-		imgui.Checkbox(u8"Грув", rgrove)
-	    imgui.Checkbox(u8"Баллас", rballas)
-	    imgui.Checkbox(u8"Рифа", rrifa)
-	    imgui.Checkbox(u8"Ацтек", raztec)
-	    imgui.Checkbox(u8"Ночные волки", rnw)
-	    imgui.Checkbox(u8"Вагос", rvagos)
+		imgui.Checkbox(u8"ГѓГ°ГіГў", rgrove)
+	    imgui.Checkbox(u8"ГЃГ Г«Г«Г Г±", rballas)
+	    imgui.Checkbox(u8"ГђГЁГґГ ", rrifa)
+	    imgui.Checkbox(u8"ГЂГ¶ГІГҐГЄ", raztec)
+	    imgui.Checkbox(u8"ГЌГ®Г·Г­Г»ГҐ ГўГ®Г«ГЄГЁ", rnw)
+	    imgui.Checkbox(u8"Г‚Г ГЈГ®Г±", rvagos)
 		save1()
 		imgui.EndChild()
 	end
 	if selected == 3 then
 		imgui.BeginChild('##information', imgui.ImVec2(380, 340), true)
-		imgui.CenterText(u8'Информация')
+		imgui.CenterText(u8'Г€Г­ГґГ®Г°Г¬Г Г¶ГЁГї')
 		imgui.Separator()
-		imgui.Text(u8'Автор: Tomato')
-		imgui.Text(u8'Запустить скрипт: /mrender')
+		imgui.Text(u8'ГЂГўГІГ®Г°: Tomato')
+		imgui.Text(u8'Г‡Г ГЇГіГ±ГІГЁГІГј Г±ГЄГ°ГЁГЇГІ: /mrender')
 		imgui.Separator()
-        imgui.Text(u8'ВНИМАНИЕ!!!')
-		imgui.Text(u8'При использовании в редких случаях')
-		imgui.Text(u8'Возможны потери fps до 10%')
-		imgui.Text(u8'Это связано с обновлением кастомизации')
-		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 3%')
+        imgui.Text(u8'Г‚ГЌГ€ГЊГЂГЌГ€Г…!!!')
+		imgui.Text(u8'ГЏГ°ГЁ ГЁГ±ГЇГ®Г«ГјГ§Г®ГўГ Г­ГЁГЁ Гў Г°ГҐГ¤ГЄГЁГµ Г±Г«ГіГ·Г ГїГµ')
+		imgui.Text(u8'Г‚Г®Г§Г¬Г®Г¦Г­Г» ГЇГ®ГІГҐГ°ГЁ fps Г¤Г® 10%')
+		imgui.Text(u8'ГќГІГ® Г±ГўГїГ§Г Г­Г® Г± Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐГ¬ ГЄГ Г±ГІГ®Г¬ГЁГ§Г Г¶ГЁГЁ')
+		imgui.Text(u8'Г’Г ГЄГ¦ГҐ ГЇГ°ГЁ Г®ГІГЄГ°Г»ГІГЁГЁ Г±ГЄГ°ГЁГЇГІГ  ГўГ®Г§Г¬Г®Г¦Г­Г» ГЇГ®ГІГҐГ°ГЁ fps Г¤Г® 3%')
 		imgui.EndChild()
 	end
     if selected == 4 then
 		imgui.BeginChild('##settings', imgui.ImVec2(380, 340), true)
-		imgui.CenterText(u8'Кастомизация')
+		imgui.CenterText(u8'ГЉГ Г±ГІГ®Г¬ГЁГ§Г Г¶ГЁГї')
         imgui.Separator()
-		if imgui.Combo(u8'Цвет линии', combo, colors) then
+		if imgui.Combo(u8'Г–ГўГҐГІ Г«ГЁГ­ГЁГЁ', combo, colors) then
 		    mainIni.settings.combo = combo.v
 			inicfg.save(mainIni, "MRender.ini")
 	    end
-		if imgui.Combo(u8'Ширина линии', combo1, width) then
+		if imgui.Combo(u8'ГГЁГ°ГЁГ­Г  Г«ГЁГ­ГЁГЁ', combo1, width) then
 		    mainIni.settings.combo1 = combo1.v
 			inicfg.save(mainIni, "MRender.ini")
 	    end
-		if imgui.Combo(u8'Цвет названия(obj)', combo2, colorsobj) then
+		if imgui.Combo(u8'Г–ГўГҐГІ Г­Г Г§ГўГ Г­ГЁГї(obj)', combo2, colorsobj) then
 		    mainIni.settings.combo2 = combo2.v
 			inicfg.save(mainIni, "MRender.ini")
 	    end
-		if imgui.InputText(u8'##Название скрипта', nazvanie3) then
+		if imgui.InputText(u8'##ГЌГ Г§ГўГ Г­ГЁГҐ Г±ГЄГ°ГЁГЇГІГ ', nazvanie3) then
 			mainIni.settings.nazvanie3 = nazvanie3.v
 			inicfg.save(mainIni, "MRender.ini")
 		end
-		imgui.Text(u8'Указывайте команду активации без / (!!!)')
-		imgui.Text(u8'После ввода новой команды,перезагрузите скрипты или перезайдите в игру')
+		imgui.Text(u8'Г“ГЄГ Г§Г»ГўГ Г©ГІГҐ ГЄГ®Г¬Г Г­Г¤Гі Г ГЄГІГЁГўГ Г¶ГЁГЁ ГЎГҐГ§ / (!!!)')
+		imgui.Text(u8'ГЏГ®Г±Г«ГҐ ГўГўГ®Г¤Г  Г­Г®ГўГ®Г© ГЄГ®Г¬Г Г­Г¤Г»,ГЇГҐГ°ГҐГ§Г ГЈГ°ГіГ§ГЁГІГҐ Г±ГЄГ°ГЁГЇГІГ» ГЁГ«ГЁ ГЇГҐГ°ГҐГ§Г Г©Г¤ГЁГІГҐ Гў ГЁГЈГ°Гі')
 		imgui.EndChild()
 	end
 	if selected == 5 then
 		imgui.BeginChild('##update', imgui.ImVec2(380, 340), true)
-		imgui.CenterText(u8'Авто-обновление')
+		imgui.CenterText(u8'ГЂГўГІГ®-Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ')
         imgui.Separator()
-		if imgui.Button(u8'Загрузить обновление', imgui.ImVec2(150,50)) then
+		if imgui.Button(u8'Г‡Г ГЈГ°ГіГ§ГЁГІГј Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ', imgui.ImVec2(150,50)) then
 			local lastver = update():getLastVersion()
             if thisScript().version ~= lastver then
-			sampAddChatMessage('[AUTOUPDATE] {D5DEDD}Доступно обновление! Скачиваю...',0xFF0000)
+			sampAddChatMessage('[AUTOUPDATE] {D5DEDD}Г„Г®Г±ГІГіГЇГ­Г® Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ! Г‘ГЄГ Г·ГЁГўГ Гѕ...',0xFF0000)
             update():download()
             end
 			if thisScript().version == lastver then
-                sampAddChatMessage('[AUTOUPDATE] {D5DEDD}У вас уже актуальная версия!',0xFF0000)
+                sampAddChatMessage('[AUTOUPDATE] {D5DEDD}Г“ ГўГ Г± ГіГ¦ГҐ Г ГЄГІГіГ Г«ГјГ­Г Гї ГўГҐГ°Г±ГЁГї!',0xFF0000)
 			end
 		end
 		imgui.EndChild()
