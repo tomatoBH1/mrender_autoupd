@@ -73,7 +73,7 @@ local mainIni = inicfg.load({
 	combo = 0,
 	combo1 = 2,
 	combo2 = 0,
-	nazvanie3 = u8'mrender'
+	nazvanie3 = 'mrender'
 	}
 }, 'MRender')
 
