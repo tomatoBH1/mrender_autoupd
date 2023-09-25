@@ -119,11 +119,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
     
 	local lastver = update():getLastVersion()
     sampAddChatMessage('[MRender - PRO] {D5DEDD}Скрипт загружен, версия: '..lastver, 0xFF0000)
-	sampAddChatMessage('[MRender - PRO] {D5DEDD}Команда: '..mainIni.settings.nazvanie3, 0xFF0000)
+	sampAddChatMessage('[MRender - PRO] {D5DEDD}Команда: /'..mainIni.settings.nazvanie3, 0xFF0000)
     if thisScript().version ~= lastver then
         sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), скачайте обновление в IMGUI-окне', 0xFF0000)
     end
-	sampRegisterChatCommand('/ '..mainIni.settings.nazvanie3, function()
+	sampRegisterChatCommand(mainIni.settings.nazvanie3, function()
         main_window_state.v = not main_window_state.v
 
         imgui.Process = main_window_state.v
