@@ -52,9 +52,6 @@ local mainIni = inicfg.load({
 	    rsem = false,
 	    rryda = false,
 	    rderevo = false,
-		rrom = false,
-		rdyblon = false,
-		rporox = false,
 		rdrevecina = false,
 		svoiobj1 = false,
 		svoiobj2 = false,
@@ -73,7 +70,7 @@ local mainIni = inicfg.load({
 	combo = 0,
 	combo1 = 2,
 	combo2 = 0,
-	nazvanie3 = 'mrender'
+	nazvanie3 = u8'mrender'
 	}
 }, 'MRender')
 
@@ -93,9 +90,6 @@ local nazvanie2 = imgui.ImBuffer(mainIni.render.nazvanie2, 256)
 local nazvanie3 = imgui.ImBuffer(mainIni.settings.nazvanie3, 256)
 
 ---------------------ивент-----------------------------
-local rrom = imgui.ImBool(mainIni.render.rrom)
-local rdyblon = imgui.ImBool(mainIni.render.rdyblon)
-local rporox = imgui.ImBool(mainIni.render.rporox)
 ------------------------------------------------------
 local rgrove = imgui.ImBool(mainIni.ghetto.rgrove)
 local rballas = imgui.ImBool(mainIni.ghetto.rballas)
@@ -264,57 +258,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     end
                 end
 				if rderevo.v and text:find("Ќажмите ALT, чтобы собрать плоды") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-				if rrom.v and text:find("Ѕутылка рома") then
-                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                    local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'Ѕутылка рома', wposX, wposY,test2)
-                    end
-                end
-				if rrom.v and text:find("Ѕутылка рома") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-				if rdyblon.v and text:find("ѕиратский дублон") then
-                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                    local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'ѕиратский дублон', wposX, wposY,test2)
-                    end
-                end
-				if rdyblon.v and text:find("ѕиратский дублон") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-				if rdyblon.v and text:find("ящик с порохом") then
-                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                    local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'ящик с порохом', wposX, wposY,test2)
-                    end
-                end
-				if rdyblon.v and text:find("ящик с порохом") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -537,11 +480,7 @@ function imgui.OnDrawFrame()
 		imgui.InputText(u8'##Ќазвание объекта дл€ рендера є2', nazvanie2)
 		save1()
 		imgui.Separator()
-		imgui.CenterText(u8'»венты(ƒень “руда 2023)')
-		imgui.Separator()
-		imgui.Checkbox(u8"Ѕутылка рома", rrom)
-		imgui.Checkbox(u8"ѕиратский дублон", rdyblon)
-		imgui.Checkbox(u8"ящик с порохом", rporox)
+		imgui.CenterText(u8'»венты(Ќету ивента)')
 		save1()
 		imgui.EndChild()
 	end
@@ -698,9 +637,6 @@ function save1()
 	mainIni.ghetto.raztec =  raztec.v
 	mainIni.ghetto.rnw = rnw.v
 	mainIni.ghetto.rvagos =  rvagos.v
-	mainIni.render.rrom =  rrom.v
-	mainIni.render.rdyblon =  rdyblon.v
-	mainIni.render.rporox =  rporox.v
 	mainIni.render.rdrevecina =  rdrevecina.v
 	mainIni.render.svoiobj1 =  svoiobj1.v
 	mainIni.render.svoiobj2 =  svoiobj2.v
