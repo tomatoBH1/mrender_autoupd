@@ -1,4 +1,4 @@
-script_version('1.7.4')
+script_version('1.7.5')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -33,7 +33,7 @@ end
 require 'lib.moonloader'
 local imgui = require 'imgui'
 local inicfg = require 'inicfg'
-local font = renderCreateFont("Brittanica", 8, 5)
+local font = renderCreateFont("Brittanica", 10, 5)
 local encoding = require 'encoding'
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
@@ -155,11 +155,20 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 		for k, v in pairs(getAllObjects()) do
 			local num = getObjectModel(v)
 			if isObjectOnScreen(v) and rklad.v then
-				if num == 1271 then
+				if num == 1271 and num == 2680 then
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Сундук', wX, wY , test2)
+					renderFontDrawText(font, ' Клад', wX, wY , test2)
+					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
+					end
+			end
+			if isObjectOnScreen(v) and rklad.v then
+				if num == 2680 then
+					local res, px, py, pz = getObjectCoordinates(v)
+					local wX, wY = convert3DCoordsToScreen(px, py, pz)
+					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
+					renderFontDrawText(font, ' Клад (Возможно фейк)', wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
@@ -441,7 +450,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(550, 370), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.7.4(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.7.5(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 340), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 58)) then selected = 1 end
