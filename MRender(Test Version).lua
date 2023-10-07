@@ -1,4 +1,4 @@
-script_version('1.7.5')
+script_version('1.7.6')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -32,6 +32,7 @@ end
 
 require 'lib.moonloader'
 local imgui = require 'imgui'
+ffi = require("ffi")
 local inicfg = require 'inicfg'
 local font = renderCreateFont("Brittanica", 10, 5)
 local encoding = require 'encoding'
@@ -55,8 +56,8 @@ local mainIni = inicfg.load({
 		rdrevecina = false,
 		svoiobj1 = false,
 		svoiobj2 = false,
-	    nazvanie1 = u8'Тестируем1',
-		nazvanie2 = u8'Тестируем2'
+	    nazvanie1 = u8'name1',
+		nazvanie2 = u8'name2'
     },
     ghetto = {
 	rgrove = false,
@@ -112,11 +113,17 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
     while not isSampAvailable() do wait(100) end
     
 	local lastver = update():getLastVersion()
-    sampAddChatMessage('[MRender - PRO] {D5DEDD}Скрипт загружен, версия: '..lastver, 0xFF0000)
-	sampAddChatMessage('[MRender - PRO] {D5DEDD}Команда: /'..mainIni.settings.nazvanie3, 0xFF0000)
+    sampAddChatMessage('[MRender] {D5DEDD}Скрипт загружен, версия: '..lastver, 0xFF0000)
+	sampAddChatMessage('[MRender] {D5DEDD}Команда: /'..mainIni.settings.nazvanie3, 0xFF0000)
+	sampAddChatMessage('[MRender] {D5DEDD}Команда для удаления/cброса конфига: /removeconfig', 0xFF0000)
     if thisScript().version ~= lastver then
         sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), скачайте обновление в IMGUI-окне', 0xFF0000)
     end
+	sampRegisterChatCommand('removeconfig', function()
+        os.remove('moonloader\\config\\MRender.ini')
+		thisScript():reload()
+		sampAddChatMessage('[MRender] {D5DEDD}Конфиг скрипта сброшен!', 0xFF0000)
+    end)
 	sampRegisterChatCommand(mainIni.settings.nazvanie3, function()
         main_window_state.v = not main_window_state.v
 
@@ -449,8 +456,8 @@ function imgui.OnDrawFrame()
 	if not main_window_state.v then imgui.Process = false end
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-	imgui.SetNextWindowSize(imgui.ImVec2(550, 370), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.7.5(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.SetNextWindowSize(imgui.ImVec2(560, 370), imgui.Cond.FirstUseEver)
+	imgui.Begin(u8'MRender v1.7.6(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 340), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 58)) then selected = 1 end
@@ -465,7 +472,7 @@ function imgui.OnDrawFrame()
 	imgui.EndChild()
 	imgui.SameLine()
 	if selected == 1 then
-		imgui.BeginChild('##render', imgui.ImVec2(380, 340), true)
+		imgui.BeginChild('##render', imgui.ImVec2(390, 340), true)
 		imgui.CenterText(u8'Основное')
 		imgui.Separator()
 		imgui.Checkbox(u8"Лен", rlen)
@@ -494,7 +501,7 @@ function imgui.OnDrawFrame()
 		imgui.EndChild()
 	end
 	if selected == 2 then
-		imgui.BeginChild('##getto', imgui.ImVec2(380, 340), true)
+		imgui.BeginChild('##getto', imgui.ImVec2(390, 340), true)
 		imgui.CenterText(u8'Рендер граффити')
 		imgui.Separator()
 		imgui.Checkbox(u8"Грув", rgrove)
@@ -507,21 +514,23 @@ function imgui.OnDrawFrame()
 		imgui.EndChild()
 	end
 	if selected == 3 then
-		imgui.BeginChild('##information', imgui.ImVec2(380, 340), true)
+		imgui.BeginChild('##information', imgui.ImVec2(390, 340), true)
 		imgui.CenterText(u8'Информация')
 		imgui.Separator()
 		imgui.Text(u8'Автор: Tomato')
 		imgui.Text(u8'Запустить скрипт: /mrender')
+		imgui.Text(u8'--[] Если скрипт начал неправильно работать - сбросите конфиг')
+		imgui.Text(u8'--[] Для сброса конфига - используйте команду: /removeconfig')
 		imgui.Separator()
         imgui.Text(u8'ВНИМАНИЕ!!!')
 		imgui.Text(u8'При использовании в редких случаях')
-		imgui.Text(u8'Возможны потери fps до 10%')
+		imgui.Text(u8'Возможны потери fps до 7%')
 		imgui.Text(u8'Это связано с обновлением кастомизации')
 		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 3%')
 		imgui.EndChild()
 	end
     if selected == 4 then
-		imgui.BeginChild('##settings', imgui.ImVec2(380, 340), true)
+		imgui.BeginChild('##settings', imgui.ImVec2(390, 340), true)
 		imgui.CenterText(u8'Кастомизация')
         imgui.Separator()
 		if imgui.Combo(u8'Цвет линии', combo, colors) then
@@ -541,11 +550,18 @@ function imgui.OnDrawFrame()
 			inicfg.save(mainIni, "MRender.ini")
 		end
 		imgui.Text(u8'Указывайте команду активации без / (!!!)')
-		imgui.Text(u8'После ввода новой команды,перезагрузите скрипты или перезайдите в игру')
+		imgui.Text(u8'После ввода новой команды,перезагрузите скрипты')
+		imgui.Text(u8'или перезайдите в игру')
+		imgui.Separator()
+		if imgui.Button(u8'Выгрузить скрипт', imgui.ImVec2(120,40)) then
+			thisScript():unload()
+		end
+		imgui.Text(u8'[]-- Чтобы скрипт вернулся в игру, перезагрузите скрипты')
+		imgui.Text(u8'[]-- Или перезайдите в игру')
 		imgui.EndChild()
 	end
 	if selected == 5 then
-		imgui.BeginChild('##update', imgui.ImVec2(380, 340), true)
+		imgui.BeginChild('##update', imgui.ImVec2(390, 340), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
 		if imgui.Button(u8'Загрузить обновление', imgui.ImVec2(150,50)) then
