@@ -527,7 +527,8 @@ function imgui.OnDrawFrame()
 		imgui.BeginChild('##information', imgui.ImVec2(390, 340), true)
 		imgui.CenterText(u8'Информация')
 		imgui.Separator()
-		imgui.Text(u8'Автор: Tomato')
+		imgui.Link(u8'https://www.blast.hk/members/449591/', u8'Профиль автора на BlastHack')
+		imgui.Link('https://t.me/rendersamp', u8'Telegram-канал скрипта')
 		imgui.Text(u8'Запустить скрипт: /mrender')
 		imgui.Text(u8'--[] Если скрипт начал неправильно работать - сбросите конфиг')
 		imgui.Text(u8'--[] Для сброса конфига - используйте команду: /removeconfig')
@@ -689,26 +690,24 @@ function imgui.CenterText(text)
 	imgui.Text(text)
 end
 
-function imgui.Link(label, description)
-	local width = imgui.GetWindowWidth()
-	local size = imgui.CalcTextSize(label)
-	local p = imgui.GetCursorScreenPos()
-	local p2 = imgui.GetCursorPos()
-	local result = imgui.InvisibleButton(label, imgui.ImVec2(width-16, size.y))
-	imgui.SetCursorPos(p2)
-	imgui.SetCursorPosX(width/2-size.x/2)
-	if imgui.IsItemHovered() then
-		if description then
-			imgui.BeginTooltip()
-			imgui.PushTextWrapPos(500)
-			imgui.TextUnformatted(description)
-			imgui.PopTextWrapPos()
-			imgui.EndTooltip()
-		end
-		imgui.TextColored(imgui.GetStyle().Colors[imgui.Col.CheckMark], label)
-		imgui.GetWindowDrawList():AddLine(imgui.ImVec2(width/2-size.x/2+p.x-8, p.y + size.y), imgui.ImVec2(width/2-size.x/2+p.x-8 + size.x, p.y + size.y), imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.CheckMark]))
-	else
-		imgui.TextColored(imgui.GetStyle().Colors[imgui.Col.CheckMark], label)
-	end
-	return result
+function imgui.Link(link,name,myfunc)
+    myfunc = type(name) == 'boolean' and name or myfunc or false
+    name = type(name) == 'string' and name or type(name) == 'boolean' and link or link
+    local size = imgui.CalcTextSize(name)
+    local p = imgui.GetCursorScreenPos()
+    local p2 = imgui.GetCursorPos()
+    local resultBtn = imgui.InvisibleButton('##'..link..name, size)
+    if resultBtn then
+        if not myfunc then
+            os.execute('explorer '..link)
+        end
+    end
+    imgui.SetCursorPos(p2)
+    if imgui.IsItemHovered() then
+        imgui.TextColored(imgui.ImVec4(0, 0.5, 1, 1), name)
+        imgui.GetWindowDrawList():AddLine(imgui.ImVec2(p.x, p.y + size.y), imgui.ImVec2(p.x + size.x, p.y + size.y), imgui.GetColorU32(imgui.ImVec4(0, 0.5, 1, 1)))
+    else
+        imgui.TextColored(imgui.ImVec4(0, 0.3, 0.8, 1), name)
+    end
+    return resultBtn
 end
