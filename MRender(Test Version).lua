@@ -1,4 +1,4 @@
-script_version('1.7.6')
+script_version('1.7.7')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -39,9 +39,9 @@ local encoding = require 'encoding'
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 local selected = 1
-local colors = {u8"Красный", u8"Оранжевый", u8"Желтый"}
-local width = {u8"1.0", u8"2.0", u8"3.0", u8"4.0"}
-local colorsobj = {u8"Белый", u8"Красный", u8"Оранжевый", u8"Желтый"}
+local colors = {u8"Красный(Default)", u8"Оранжевый", u8"Желтый",u8"Зеленый", u8"Малиновый"}
+local width = {u8"5", u8"7", u8"10(Оптимально)", u8"12", u8"15"}
+local colorsobj = {u8"Белый(Default)", u8"Красный", u8"Оранжевый", u8"Желтый", u8"Зеленый", u8"Малиновый"}
 
 local mainIni = inicfg.load({
 	render = {
@@ -140,6 +140,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 			    test = '0xFFFFA500' -- orange
 		    elseif combo.v == 2 then
 			    test = '0xFFFFFF00' -- yellow
+			elseif combo.v == 3 then
+				test = '0xFF008000' -- GREEN
+			elseif combo.v == 4 then
+				test = '0xFFDC143C' -- crimson chapoooooo
 		end
 		if combo1.v == 0 then
 			test1 = '1.0'
@@ -149,15 +153,21 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 			    test1 = '3.0' --
 			elseif combo1.v == 3 then
 				test1 = '4.0'
+			elseif combo1.v == 4 then
+				test1 = '5.0'
 		end
 		if combo2.v == 0 then
-			test2 = '0xFFFFFFFF'
+			test2 = '0xFFFFFFFF' -- white
 		    elseif combo2.v == 1 then
 			    test2 = '0xFFFF0000' -- red
 		    elseif combo2.v == 2 then
 			    test2 = '0xFFFFA500' -- orange
 		    elseif combo2.v == 3 then
 			    test2 = '0xFFFFFF00' -- yellow
+			elseif combo2.v == 4 then
+				test2 = '0xFF008000' -- GREEN
+			elseif combo2.v == 5 then
+				test2 = '0xFFDC143C' -- crimson chapoooooo
 		end
 		for k, v in pairs(getAllObjects()) do
 			local num = getObjectModel(v)
@@ -264,7 +274,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     end
                 end
 				--деревья
-				if rderevo.v and text:find("Нажмите ALT, чтобы собрать плоды") then
+				if rderevo.v and text:find("Используйте: 'Действие', чтобы собрать плоды") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -273,7 +283,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderFontDrawText(font,text, wposX, wposY,test2)
                     end
                 end
-				if rderevo.v and text:find("Нажмите ALT, чтобы собрать плоды") then 
+				if rderevo.v and text:find("Используйте: 'Действие', чтобы собрать плоды") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -300,7 +310,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                 end
 
 				--банды
-				if rgrove.v and text:find("Grove Street") then
+				if rgrove.v and text:find("Банда: {FFFFFF}Grove Street") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -309,7 +319,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderFontDrawText(font,text, wposX, wposY,test2)
                     end
                 end
-				if rgrove.v and text:find("Grove Street") then 
+				if rgrove.v and text:find("Банда: {FFFFFF}Grove Street") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -317,7 +327,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				if rballas.v and text:find("East Side Ballas") then
+				if rballas.v and text:find("Банда: {FFFFFF}East Side Ballas") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -327,7 +337,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if rballas.v and text:find("East Side Ballas") then 
+				if rballas.v and text:find("Банда: {FFFFFF}East Side Ballas") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -335,7 +345,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-			    if rrifa.v and text:find("The Rifa") then
+			    if rrifa.v and text:find("Банда: {FFFFFF}The Rifa")  then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -345,7 +355,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if rrifa.v and text:find("The Rifa") then 
+				if rrifa.v and text:find("Банда: {FFFFFF}The Rifa") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -353,7 +363,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				 if raztec.v and text:find("Varrios Los Aztecas") then
+				if raztec.v and text:find("Банда: {FFFFFF}Varrios Los Aztecas") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -363,7 +373,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if raztec.v and text:find("Varrios Los Aztecas") then 
+				if raztec.v and text:find("Банда: {FFFFFF}Varrios Los Aztecas") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -371,7 +381,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				if rnw.v and text:find("Night Wolves") then
+				if rnw.v and text:find("Банда: {FFFFFF}Night Wolves") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -381,7 +391,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if rnw.v and text:find("Night Wolves") then 
+				if rnw.v and text:find("Банда: {FFFFFF}Night Wolves") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -389,7 +399,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
                 end
-				if rvagos.v and text:find("Los Santos Vagos") then
+				if rvagos.v and text:find("Банда: {FFFFFF}Los Santos Vagos") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -399,7 +409,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
                     end
                 end
-				if rvagos.v and text:find("Los Santos Vagos") then 
+				if rvagos.v and text:find("Банда: {FFFFFF}Los Santos Vagos") then 
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -457,7 +467,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(560, 370), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.7.6(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.7.7(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 340), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 58)) then selected = 1 end
@@ -561,10 +571,11 @@ function imgui.OnDrawFrame()
 		imgui.EndChild()
 	end
 	if selected == 5 then
+		--sampAddChatMessage('[debug] code:001 -update process.start',-1)
 		imgui.BeginChild('##update', imgui.ImVec2(390, 340), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
-		if imgui.Button(u8'Загрузить обновление', imgui.ImVec2(150,50)) then
+		if imgui.Button(u8'Загрузить обновление', imgui.ImVec2(140,50)) then
 			local lastver = update():getLastVersion()
             if thisScript().version ~= lastver then
 			sampAddChatMessage('[AUTOUPDATE] {D5DEDD}Доступно обновление! Скачиваю...',0xFF0000)
@@ -602,6 +613,7 @@ function theme()
 	style.GrabMinSize = 20.0
 	style.GrabRounding = 5.0
 	style.WindowTitleAlign = ImVec2(0.5, 0.5)
+	style.ButtonTextAlign = ImVec2(0.5, 0.5) -- Значения от 0 до 1
 
 	colors[clr.Text]                    = ImVec4(1.00, 1.00, 1.00, 1.00)
 	colors[clr.TextDisabled]            = ImVec4(0.20, 0.20, 0.20, 1.00)
