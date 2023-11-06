@@ -1,4 +1,4 @@
-script_version('1.7.8')
+script_version('1.7.9')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -288,7 +288,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     end
                 end--]]
 				--деревья
-				if rderevo.v and text:find("Кокосовое дерево") or text:find("Сливовое дерево") or text:find("Яблочное дерево") then
+				if rderevo.v and text:find("Кокосовое дерево") or rderevo.v and text:find("Сливовое дерево") or rderevo.v and text:find("Яблочное дерево") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -423,7 +423,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(560, 370), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.7.8(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.7.9(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 340), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 58)) then selected = 1 end
@@ -450,7 +450,7 @@ function imgui.OnDrawFrame()
 		imgui.Checkbox(u8"Семена", rsem)
 		imgui.Checkbox(u8"Олени(временно не работает)", rolen)
 		imgui.Checkbox(u8"Руда", rryda)
-		imgui.Checkbox(u8"Деревья(плоды)", rderevo)
+		imgui.Checkbox(u8"Деревья с плодами", rderevo)
 		imgui.Checkbox(u8"Деревья высшего качества", rdrevecina)
 		imgui.Separator()
 		imgui.CenterText(u8'Свои объекты')
@@ -490,9 +490,9 @@ function imgui.OnDrawFrame()
 		imgui.Separator()
         imgui.Text(u8'ВНИМАНИЕ!!!')
 		imgui.Text(u8'При использовании в редких случаях')
-		imgui.Text(u8'Возможны потери fps до 7%')
+		imgui.Text(u8'Возможны потери fps до 15%')
 		imgui.Text(u8'Это связано с обновлением кастомизации')
-		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 3%')
+		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 6%')
 		imgui.EndChild()
 	end
     if selected == 4 then
