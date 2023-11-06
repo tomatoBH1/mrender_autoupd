@@ -1,4 +1,4 @@
-script_version('1.7.7')
+script_version('1.7.8')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -42,6 +42,7 @@ local selected = 1
 local colors = {u8"Красный(Default)", u8"Оранжевый", u8"Желтый",u8"Зеленый", u8"Малиновый"}
 local width = {u8"5", u8"7", u8"10(Оптимально)", u8"12", u8"15"}
 local colorsobj = {u8"Белый(Default)", u8"Красный", u8"Оранжевый", u8"Желтый", u8"Зеленый", u8"Малиновый"}
+local colortema = {u8"Черный(Default)", u8"Синий", u8"Фиолетовый"}
 
 local mainIni = inicfg.load({
 	render = {
@@ -71,6 +72,7 @@ local mainIni = inicfg.load({
 	combo = 0,
 	combo1 = 2,
 	combo2 = 0,
+	combo3 = 0,
 	nazvanie3 = u8'mrender'
 	}
 }, 'MRender')
@@ -101,6 +103,7 @@ local rvagos = imgui.ImBool(mainIni.ghetto.rvagos)
 local combo = imgui.ImInt(mainIni.settings.combo)
 local combo1 = imgui.ImInt(mainIni.settings.combo1)
 local combo2 = imgui.ImInt(mainIni.settings.combo2)
+local combo3 = imgui.ImInt(mainIni.settings.combo3)
 
 
 local main_window_state = imgui.ImBool(false)
@@ -175,26 +178,30 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 				if num == 1271 and num == 2680 then
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Клад', wX, wY , test2)
-					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
-					end
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Клад\n Дистанция: '..distance, wX, wY , test2)
+				end
 			end
 			if isObjectOnScreen(v) and rklad.v then
 				if num == 2680 then
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Клад (Возможно фейк)', wX, wY , test2)
-					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Клад(Возможно фейк)\n Дистанция: '..distance, wX, wY , test2)
 				end
 			end
 			if isObjectOnScreen(v) and rsem.v then
 				if num == 859 then
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Семена', wX, wY , test2)
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Семена\n Дистанция: '..distance, wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
@@ -202,17 +209,21 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 				if num == 854 then
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Руда', wX, wY , test2)
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Руда\n Дистанция: '..distance, wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
-            if isObjectOnScreen(v) and rolen.v then
+			if isObjectOnScreen(v) and rolen.v then
 				if num == 19315 then
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					renderFontDrawText(font, ' Олень', wX, wY , test2)
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Олень\n Дистанция: '..distance, wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
@@ -221,22 +232,18 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
             local result = sampIs3dTextDefined( id )
             if result then
                 local text, color, posX, posY, posZ, distance, ignoreWalls, playerId, vehicleId = sampGet3dTextInfoById( id )
-				
+				distance = string.format("%.0fм", getDistanceBetweenCoords3d(posX, posY, posZ,x2,y2,z2))
+				local texto = text..'\n Дистанция: '..distance
                 if rzakladka.v and text:find("Закладка") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,' Закладка', wposX, wposY,test2)
-                    end
-                end
-				if rzakladka.v and text:find("Закладка") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        renderFontDrawText(font,' Закладка\n Дистанция: '..distance, wposX, wposY,test2)
                     end
                 end
 				if rlen.v and text:find("Лён") then
@@ -244,16 +251,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,text, wposX, wposY,test2)
-                    end
-                end
-				if rlen.v and text:find("Лён") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
 				if rhlopok.v and text:find("Хлопок") then
@@ -261,20 +263,14 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,text, wposX, wposY,test2)
-                    end
-                end
-				if rhlopok.v and text:find("Хлопок") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
                     end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        renderFontDrawText(font,texto, wposX, wposY,test2)
+                    end
                 end
-				--деревья
-				if rderevo.v and text:find("Используйте: 'Действие', чтобы собрать плоды") then
+				--[[if rolen.v and text:find("Олень") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -283,48 +279,50 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderFontDrawText(font,text, wposX, wposY,test2)
                     end
                 end
-				if rderevo.v and text:find("Используйте: 'Действие', чтобы собрать плоды") then 
+				if rolen.v and text:find("Олень") then
                     if isPointOnScreen (posX,posY,posZ,1) then
                         wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                         x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                         x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                    end
+                end--]]
+				--деревья
+				if rderevo.v and text:find("Кокосовое дерево") or text:find("Сливовое дерево") or text:find("Яблочное дерево") then
+                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
+                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+                    local resX, resY = getScreenResolution()
+					if isPointOnScreen (posX,posY,posZ,1) then
+                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
 				if rdrevecina.v and text:find("Дерево высшего качества") then
-                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+					local resX, resY = getScreenResolution()
+					local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                    local resX, resY = getScreenResolution()
+					if isPointOnScreen (posX,posY,posZ,1) then
+					    renderDrawLine(x10, y10, wposX, wposY, test1, test)
+					end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,'Дерево выс.качества', wposX, wposY,test2)
+                        renderFontDrawText(font,' Дерево выс.качества\n Дистанция: '..distance, wposX, wposY,test2)
                     end
                 end
-				if rdrevecina.v and text:find("Дерево высшего качества") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end
-
 				--банды
 				if rgrove.v and text:find("Банда: {FFFFFF}Grove Street") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,text, wposX, wposY,test2)
-                    end
-                end
-				if rgrove.v and text:find("Банда: {FFFFFF}Grove Street") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
 				if rballas.v and text:find("Банда: {FFFFFF}East Side Ballas") then
@@ -332,17 +330,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,text, wposX, wposY,test2)
+					if isPointOnScreen (posX,posY,posZ,1) then
 						renderDrawLine(x10, y10, wposX, wposY, test1, test)
-                    end
-                end
-				if rballas.v and text:find("Банда: {FFFFFF}East Side Ballas") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+					end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
 			    if rrifa.v and text:find("Банда: {FFFFFF}The Rifa")  then
@@ -350,17 +342,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,text, wposX, wposY,test2)
-						renderDrawLine(x10, y10, wposX, wposY, test1, test)
-                    end
-                end
-				if rrifa.v and text:find("Банда: {FFFFFF}The Rifa") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
 				if raztec.v and text:find("Банда: {FFFFFF}Varrios Los Aztecas") then
@@ -368,17 +354,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,text, wposX, wposY,test2)
-						renderDrawLine(x10, y10, wposX, wposY, test1, test)
-                    end
-                end
-				if raztec.v and text:find("Банда: {FFFFFF}Varrios Los Aztecas") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
 				if rnw.v and text:find("Банда: {FFFFFF}Night Wolves") then
@@ -386,17 +366,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,text, wposX, wposY,test2)
-						renderDrawLine(x10, y10, wposX, wposY, test1, test)
-                    end
-                end
-				if rnw.v and text:find("Банда: {FFFFFF}Night Wolves") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
 				if rvagos.v and text:find("Банда: {FFFFFF}Los Santos Vagos") then
@@ -404,17 +378,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,text, wposX, wposY,test2)
-						renderDrawLine(x10, y10, wposX, wposY, test1, test)
-                    end
-                end
-				if rvagos.v and text:find("Банда: {FFFFFF}Los Santos Vagos") then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+						renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
 				-------------------------------Свои obj-----------------------------------
@@ -423,17 +391,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
+					if isPointOnScreen (posX,posY,posZ,1) then
+						renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+					end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,text, wposX, wposY,test2)
-						renderDrawLine(x10, y10, wposX, wposY, test1, test)
-                    end
-                end
-				if svoiobj1.v and text:find(u8:decode(nazvanie1.v)) then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+						renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
 				if svoiobj2.v and text:find(u8:decode(nazvanie2.v)) then 
@@ -441,17 +403,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,text, wposX, wposY,test2)
-						renderDrawLine(x10, y10, wposX, wposY, test1, test)
-                    end
-                end
-				if svoiobj2.v and text:find(u8:decode(nazvanie2.v)) then 
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+						renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
 			end
@@ -467,7 +423,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(560, 370), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.7.7(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.7.8(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 340), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 58)) then selected = 1 end
@@ -476,7 +432,9 @@ function imgui.OnDrawFrame()
 	imgui.Separator()
 	if imgui.Button(u8'Информация', imgui.ImVec2(135, 58)) then selected = 3 end
 	imgui.Separator()
-    if imgui.Button(u8'Кастомизация', imgui.ImVec2(135, 58)) then selected = 4 end
+    if imgui.Button(u8'Кастомизация', imgui.ImVec2(135, 58)) then selected = 4
+		sampAddChatMessage('[Кастомизация] После смены цвета окна в скрипте перезагрузите скрипты или перезайдите в игру', 0xFFFF00)
+	end
 	imgui.Separator()
 	if imgui.Button(u8'Авто-обновление', imgui.ImVec2(135, 35)) then selected = 5 end
 	imgui.EndChild()
@@ -490,7 +448,7 @@ function imgui.OnDrawFrame()
 		imgui.Checkbox(u8"Клады", rklad)
 		imgui.Checkbox(u8"Закладки", rzakladka)
 		imgui.Checkbox(u8"Семена", rsem)
-		imgui.Checkbox(u8"Олени", rolen)
+		imgui.Checkbox(u8"Олени(временно не работает)", rolen)
 		imgui.Checkbox(u8"Руда", rryda)
 		imgui.Checkbox(u8"Деревья(плоды)", rderevo)
 		imgui.Checkbox(u8"Деревья высшего качества", rdrevecina)
@@ -504,9 +462,6 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'Название для obj №2')
 		imgui.SameLine()
 		imgui.InputText(u8'##Название объекта для рендера №2', nazvanie2)
-		save1()
-		imgui.Separator()
-		imgui.CenterText(u8'Ивенты(Нету ивента)')
 		save1()
 		imgui.EndChild()
 	end
@@ -556,6 +511,11 @@ function imgui.OnDrawFrame()
 		    mainIni.settings.combo2 = combo2.v
 			inicfg.save(mainIni, "MRender.ini")
 	    end
+		if imgui.Combo(u8'Цвет окна скрипта', combo3, colortema) then
+		    mainIni.settings.combo3 = combo3.v
+			inicfg.save(mainIni, "MRender.ini")
+	    end
+		imgui.Separator()
 		if imgui.InputText(u8'##Название скрипта', nazvanie3) then
 			mainIni.settings.nazvanie3 = nazvanie3.v
 			inicfg.save(mainIni, "MRender.ini")
@@ -593,6 +553,7 @@ function imgui.OnDrawFrame()
 end
 
 function theme()
+	if combo3.v == 0 then
 	imgui.SwitchContext()
 	local style = imgui.GetStyle()
 	local colors = style.Colors
@@ -656,6 +617,139 @@ function theme()
 	colors[clr.PlotHistogramHovered]    = ImVec4(0.20, 0.20, 0.20, 1.00)
 	colors[clr.TextSelectedBg]          = ImVec4(0.05, 0.05, 0.05, 1.00)
 	colors[clr.ModalWindowDarkening]    = ImVec4(1.00, 1.00, 1.00, 1.00)
+
+	elseif combo3.v == 1 then
+	imgui.SwitchContext()
+    local style = imgui.GetStyle()
+	local colors = style.Colors
+	local clr = imgui.Col
+	local ImVec4 = imgui.ImVec4
+	local ImVec2 = imgui.ImVec2
+
+	style.WindowPadding = ImVec2(8, 8)
+	style.WindowRounding = 5.0
+	style.ChildWindowRounding = 5.0
+	style.FramePadding = ImVec2(2, 2)
+	style.FrameRounding = 5.0
+	style.ItemSpacing = ImVec2(5, 5)
+	style.ItemInnerSpacing = ImVec2(5, 5)
+	style.TouchExtraPadding = ImVec2(0, 0)
+	style.IndentSpacing = 5.0
+	style.ScrollbarSize = 13.0
+	style.ScrollbarRounding = 5.0
+	style.GrabMinSize = 20.0
+	style.GrabRounding = 5.0
+	style.WindowTitleAlign = ImVec2(0.5, 0.5)
+	style.ButtonTextAlign = ImVec2(0.5, 0.5) -- Значения от 0 до 1
+
+    colors[clr.Text] = ImVec4(0.860, 0.930, 0.890, 0.78)
+    colors[clr.TextDisabled] = ImVec4(0.860, 0.930, 0.890, 0.28)
+    colors[clr.Text]                 = ImVec4(0.86, 0.93, 0.89, 0.78)
+    colors[clr.TextDisabled]         = ImVec4(0.36, 0.42, 0.47, 1.00)
+    colors[clr.WindowBg]             = ImVec4(0.11, 0.15, 0.17, 1.00)
+    colors[clr.ChildWindowBg]        = ImVec4(0.15, 0.18, 0.22, 1.00)
+    colors[clr.PopupBg]              = ImVec4(0.08, 0.08, 0.08, 0.94)
+    colors[clr.Border]               = ImVec4(0.43, 0.43, 0.50, 0.50)
+    colors[clr.BorderShadow]         = ImVec4(0.00, 0.00, 0.00, 0.00)
+    colors[clr.FrameBg]              = ImVec4(0.20, 0.25, 0.29, 1.00)
+    colors[clr.FrameBgHovered]       = ImVec4(0.12, 0.20, 0.28, 1.00)
+    colors[clr.FrameBgActive]        = ImVec4(0.09, 0.12, 0.14, 1.00)
+    colors[clr.TitleBg]              = ImVec4(0.09, 0.12, 0.14, 0.65)
+    colors[clr.TitleBgActive]        = ImVec4(0.11, 0.30, 0.59, 1.00)
+    colors[clr.TitleBgCollapsed]     = ImVec4(0.00, 0.00, 0.00, 0.51)
+    colors[clr.MenuBarBg]            = ImVec4(0.15, 0.18, 0.22, 1.00)
+    colors[clr.ScrollbarBg]          = ImVec4(0.02, 0.02, 0.02, 0.39)
+    colors[clr.ScrollbarGrab]        = ImVec4(0.20, 0.25, 0.29, 1.00)
+    colors[clr.ScrollbarGrabHovered] = ImVec4(0.18, 0.22, 0.25, 1.00)
+    colors[clr.ScrollbarGrabActive]  = ImVec4(0.09, 0.21, 0.31, 1.00)
+    colors[clr.ComboBg]              = ImVec4(0.20, 0.25, 0.29, 1.00)
+    colors[clr.CheckMark]            = ImVec4(0.28, 0.56, 1.00, 1.00)
+    colors[clr.SliderGrab]           = ImVec4(0.28, 0.56, 1.00, 1.00)
+    colors[clr.SliderGrabActive]     = ImVec4(0.37, 0.61, 1.00, 1.00)
+    colors[clr.Button]               = ImVec4(0.08, 0.33, 0.55, 1.00)
+    colors[clr.ButtonHovered]        = ImVec4(0.28, 0.56, 1.00, 1.00)
+    colors[clr.ButtonActive]         = ImVec4(0.06, 0.53, 0.98, 1.00)
+    colors[clr.Header]               = ImVec4(0.20, 0.25, 0.29, 0.55)
+    colors[clr.HeaderHovered]        = ImVec4(0.26, 0.59, 0.98, 0.80)
+    colors[clr.HeaderActive]         = ImVec4(0.26, 0.59, 0.98, 1.00)
+    colors[clr.Separator]            = ImVec4(0.50, 0.50, 0.50, 1.00)
+    colors[clr.SeparatorHovered]     = ImVec4(0.60, 0.60, 0.70, 1.00)
+    colors[clr.SeparatorActive]      = ImVec4(0.70, 0.70, 0.90, 1.00)
+    colors[clr.ResizeGrip]           = ImVec4(0.26, 0.59, 0.98, 0.25)
+    colors[clr.ResizeGripHovered]    = ImVec4(0.26, 0.59, 0.98, 0.67)
+    colors[clr.ResizeGripActive]     = ImVec4(0.06, 0.05, 0.07, 1.00)
+    colors[clr.CloseButton]          = ImVec4(0.40, 0.39, 0.38, 0.16)
+    colors[clr.CloseButtonHovered]   = ImVec4(0.40, 0.39, 0.38, 0.39)
+    colors[clr.CloseButtonActive]    = ImVec4(0.40, 0.39, 0.38, 1.00)
+    colors[clr.PlotLines]            = ImVec4(0.61, 0.61, 0.61, 1.00)
+    colors[clr.PlotLinesHovered]     = ImVec4(1.00, 0.43, 0.35, 1.00)
+    colors[clr.PlotHistogram]        = ImVec4(0.90, 0.70, 0.00, 1.00)
+    colors[clr.PlotHistogramHovered] = ImVec4(1.00, 0.60, 0.00, 1.00)
+    colors[clr.TextSelectedBg]       = ImVec4(0.25, 1.00, 0.00, 0.43)
+    colors[clr.ModalWindowDarkening] = ImVec4(1.00, 0.98, 0.95, 0.73)
+	elseif combo3.v == 2 then
+		imgui.SwitchContext()
+        local style = imgui.GetStyle()
+	    local colors = style.Colors
+	    local clr = imgui.Col
+	    local ImVec4 = imgui.ImVec4
+	    local ImVec2 = imgui.ImVec2
+
+	    style.WindowPadding = ImVec2(8, 8)
+	    style.WindowRounding = 5.0
+	    style.ChildWindowRounding = 5.0
+	    style.FramePadding = ImVec2(2, 2)
+	    style.FrameRounding = 5.0
+	    style.ItemSpacing = ImVec2(5, 5)
+	    style.ItemInnerSpacing = ImVec2(5, 5)
+	    style.TouchExtraPadding = ImVec2(0, 0)
+	    style.IndentSpacing = 5.0
+	    style.ScrollbarSize = 13.0
+	    style.ScrollbarRounding = 5.0
+	    style.GrabMinSize = 20.0
+	    style.GrabRounding = 5.0
+	    style.WindowTitleAlign = ImVec2(0.5, 0.5)
+	    style.ButtonTextAlign = ImVec2(0.5, 0.5) -- Значения от 0 до 1 
+		
+		colors[clr.WindowBg]              = ImVec4(0, 0, 0, 1);
+		colors[clr.ChildWindowBg]         = ImVec4(0, 0, 0, 1);
+		colors[clr.PopupBg]               = ImVec4(0.05, 0.05, 0.10, 0.90);
+		colors[clr.Border]                = ImVec4(0.89, 0.85, 0.92, 0.30);
+		colors[clr.BorderShadow]          = ImVec4(0.00, 0.00, 0.00, 0.00);
+		colors[clr.FrameBg]               = ImVec4(0.12, 0.12, 0.12, 0.94);
+		colors[clr.FrameBgHovered]        = ImVec4(0.41, 0.19, 0.63, 0.68);
+		colors[clr.FrameBgActive]         = ImVec4(0.41, 0.19, 0.63, 1.00);
+		colors[clr.TitleBg]               = ImVec4(0.41, 0.19, 0.63, 0.45);
+		colors[clr.TitleBgCollapsed]      = ImVec4(0.41, 0.19, 0.63, 0.35);
+		colors[clr.TitleBgActive]         = ImVec4(0.41, 0.19, 0.63, 0.78);
+		colors[clr.MenuBarBg]             = ImVec4(0.30, 0.20, 0.39, 0.57);
+		colors[clr.ScrollbarBg]           = ImVec4(0.04, 0.04, 0.04, 1.00);
+		colors[clr.ScrollbarGrab]         = ImVec4(0.41, 0.19, 0.63, 0.31);
+		colors[clr.ScrollbarGrabHovered]  = ImVec4(0.41, 0.19, 0.63, 0.78);
+		colors[clr.ScrollbarGrabActive]   = ImVec4(0.41, 0.19, 0.63, 1.00);
+		colors[clr.ComboBg]               = ImVec4(0.30, 0.20, 0.39, 1.00);
+		colors[clr.CheckMark]             = ImVec4(0.56, 0.61, 1.00, 1.00);
+		colors[clr.SliderGrab]            = ImVec4(0.28, 0.28, 0.28, 1.00);
+		colors[clr.SliderGrabActive]      = ImVec4(0.35, 0.35, 0.35, 1.00);
+		colors[clr.Button]                = ImVec4(0.41, 0.19, 0.63, 0.44);
+		colors[clr.ButtonHovered]         = ImVec4(0.41, 0.19, 0.63, 0.86);
+		colors[clr.ButtonActive]          = ImVec4(0.64, 0.33, 0.94, 1.00);
+		colors[clr.Header]                = ImVec4(0.41, 0.19, 0.63, 0.76);
+		colors[clr.HeaderHovered]         = ImVec4(0.41, 0.19, 0.63, 0.86);
+		colors[clr.HeaderActive]          = ImVec4(0.41, 0.19, 0.63, 1.00);
+		colors[clr.ResizeGrip]            = ImVec4(0.41, 0.19, 0.63, 0.20);
+		colors[clr.ResizeGripHovered]     = ImVec4(0.41, 0.19, 0.63, 0.78);
+		colors[clr.ResizeGripActive]      = ImVec4(0.41, 0.19, 0.63, 1.00);
+		colors[clr.CloseButton]           = ImVec4(1.00, 1.00, 1.00, 0.75);
+		colors[clr.CloseButtonHovered]    = ImVec4(0.88, 0.74, 1.00, 0.59);
+		colors[clr.CloseButtonActive]     = ImVec4(0.88, 0.85, 0.92, 1.00);
+		colors[clr.PlotLines]             = ImVec4(0.89, 0.85, 0.92, 0.63);
+		colors[clr.PlotLinesHovered]      = ImVec4(0.41, 0.19, 0.63, 1.00);
+		colors[clr.PlotHistogram]         = ImVec4(0.89, 0.85, 0.92, 0.63);
+		colors[clr.PlotHistogramHovered]  = ImVec4(0.41, 0.19, 0.63, 1.00);
+		colors[clr.TextSelectedBg]        = ImVec4(0.41, 0.19, 0.63, 0.43);
+		colors[clr.ModalWindowDarkening]  = ImVec4(0.20, 0.20, 0.20, 0.35);
+	end
 end
 theme()
 
