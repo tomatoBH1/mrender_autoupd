@@ -1,4 +1,4 @@
-script_version('1.7.9')
+script_version('1.8.0')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -34,6 +34,7 @@ require 'lib.moonloader'
 local imgui = require 'imgui'
 ffi = require("ffi")
 local inicfg = require 'inicfg'
+local mem = require "memory"
 local font = renderCreateFont("Brittanica", 10, 5)
 local encoding = require 'encoding'
 encoding.default = 'CP1251'
@@ -57,6 +58,7 @@ local mainIni = inicfg.load({
 		rdrevecina = false,
 		svoiobj1 = false,
 		svoiobj2 = false,
+		rodezda = false,
 	    nazvanie1 = u8'name1',
 		nazvanie2 = u8'name2'
     },
@@ -73,6 +75,7 @@ local mainIni = inicfg.load({
 	combo1 = 2,
 	combo2 = 0,
 	combo3 = 0,
+	experimental = false,
 	nazvanie3 = u8'mrender'
 	}
 }, 'MRender')
@@ -88,6 +91,7 @@ local rderevo = imgui.ImBool(mainIni.render.rderevo)
 local rdrevecina = imgui.ImBool(mainIni.render.rdrevecina)
 local svoiobj1 = imgui.ImBool(mainIni.render.svoiobj1)
 local svoiobj2 = imgui.ImBool(mainIni.render.svoiobj2)
+local rodezda = imgui.ImBool(mainIni.render.rodezda)
 local nazvanie1 = imgui.ImBuffer(mainIni.render.nazvanie1, 256)
 local nazvanie2 = imgui.ImBuffer(mainIni.render.nazvanie2, 256)
 local nazvanie3 = imgui.ImBuffer(mainIni.settings.nazvanie3, 256)
@@ -104,9 +108,12 @@ local combo = imgui.ImInt(mainIni.settings.combo)
 local combo1 = imgui.ImInt(mainIni.settings.combo1)
 local combo2 = imgui.ImInt(mainIni.settings.combo2)
 local combo3 = imgui.ImInt(mainIni.settings.combo3)
+local experimental = imgui.ImBool(mainIni.settings.experimental)
 
 
 local main_window_state = imgui.ImBool(false)
+local imgui_2 = imgui.ImBool(false)
+local health = imgui.ImBool(false)
 local sw, sh = getScreenResolution()
 
 if not doesFileExist('moonloader/config/MRender.ini') then inicfg.save(mainIni, 'MRender.ini') end
@@ -136,7 +143,17 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
     imgui.Process = false
 	
 	while true do
+		function iws(arg) -- iws - это команда.
+			imgui_2.v = not imgui_2.v
+			imgui.Process = imgui_2.v
+		end
         wait(0)
+		if rolen.v then
+			olenOn(); 
+		end
+		if rolen.v == false then
+			olenOff()
+		end
 		if combo.v == 0 then
 			test = '0xFFFF0000' -- red
 		    elseif combo.v == 1 then
@@ -216,7 +233,18 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
-			if isObjectOnScreen(v) and rolen.v then
+			if isObjectOnScreen(v) and rodezda.v then
+				if num == 18893 or num == 2844 or num == 2819 or num == 18919 or num == 18974 or num == 18946 or num == 2705 or num == 2706 then
+					local res, px, py, pz = getObjectCoordinates(v)
+					local wX, wY = convert3DCoordsToScreen(px, py, pz)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
+					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Рваная одежда\n Дистанция: '..distance, wX, wY , test2)
+					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
+				end
+			end
+			--[[if isObjectOnScreen(v) and rolen.v then
 				if num == 19315 then
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
@@ -226,7 +254,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					renderFontDrawText(font, ' Олень\n Дистанция: '..distance, wX, wY , test2)
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
-			end
+			end]]
 		end
 		for id = 0, 2048 do
             local result = sampIs3dTextDefined( id )
@@ -270,23 +298,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderFontDrawText(font,texto, wposX, wposY,test2)
                     end
                 end
-				--[[if rolen.v and text:find("Олень") then
-                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                    local resX, resY = getScreenResolution()
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,text, wposX, wposY,test2)
-                    end
-                end
-				if rolen.v and text:find("Олень") then
-                    if isPointOnScreen (posX,posY,posZ,1) then
-                        wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                        x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                        x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
-                    end
-                end--]]
 				--деревья
 				if rderevo.v and text:find("Кокосовое дерево") or rderevo.v and text:find("Сливовое дерево") or rderevo.v and text:find("Яблочное дерево") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
@@ -422,25 +433,25 @@ function imgui.OnDrawFrame()
 	if not main_window_state.v then imgui.Process = false end
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-	imgui.SetNextWindowSize(imgui.ImVec2(560, 370), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.7.9(Тестовая версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
-	imgui.BeginChild('##menu', imgui.ImVec2(150, 340), true)
+	imgui.SetNextWindowSize(imgui.ImVec2(610, 400), imgui.Cond.FirstUseEver)
+	imgui.Begin(u8'MRender v1.8.0(Бета версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.BeginChild('##menu', imgui.ImVec2(150, 370), true)
 	imgui.CenterText(u8'Меню')
-	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 58)) then selected = 1 end
+	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 65)) then selected = 1 end
 	imgui.Separator()
-	if imgui.Button(u8'Рендер граффити', imgui.ImVec2(135, 58)) then selected = 2 end
+	if imgui.Button(u8'Рендер граффити', imgui.ImVec2(135, 65)) then selected = 2 end
 	imgui.Separator()
-	if imgui.Button(u8'Информация', imgui.ImVec2(135, 58)) then selected = 3 end
+	if imgui.Button(u8'Информация', imgui.ImVec2(135, 65)) then selected = 3 end
 	imgui.Separator()
-    if imgui.Button(u8'Кастомизация', imgui.ImVec2(135, 58)) then selected = 4
+    if imgui.Button(u8'Кастомизация', imgui.ImVec2(135, 65)) then selected = 4
 		sampAddChatMessage('[Кастомизация] После смены цвета окна в скрипте перезагрузите скрипты или перезайдите в игру', 0xFFFF00)
 	end
 	imgui.Separator()
-	if imgui.Button(u8'Авто-обновление', imgui.ImVec2(135, 35)) then selected = 5 end
+	if imgui.Button(u8'Авто-обновление', imgui.ImVec2(135, 39)) then selected = 5 end
 	imgui.EndChild()
 	imgui.SameLine()
 	if selected == 1 then
-		imgui.BeginChild('##render', imgui.ImVec2(390, 340), true)
+		imgui.BeginChild('##render', imgui.ImVec2(440, 370), true)
 		imgui.CenterText(u8'Основное')
 		imgui.Separator()
 		imgui.Checkbox(u8"Лен", rlen)
@@ -448,10 +459,13 @@ function imgui.OnDrawFrame()
 		imgui.Checkbox(u8"Клады", rklad)
 		imgui.Checkbox(u8"Закладки", rzakladka)
 		imgui.Checkbox(u8"Семена", rsem)
-		imgui.Checkbox(u8"Олени(временно не работает)", rolen)
+		if experimental.v then
+		imgui.Checkbox(u8"Олени(доступно в экспериментальном режиме)", rolen)
+		end
 		imgui.Checkbox(u8"Руда", rryda)
 		imgui.Checkbox(u8"Деревья с плодами", rderevo)
 		imgui.Checkbox(u8"Деревья высшего качества", rdrevecina)
+		imgui.Checkbox(u8"Рваная одежда", rodezda)
 		imgui.Separator()
 		imgui.CenterText(u8'Свои объекты')
 		imgui.Checkbox(u8"Свой объект №1", svoiobj1)
@@ -466,7 +480,7 @@ function imgui.OnDrawFrame()
 		imgui.EndChild()
 	end
 	if selected == 2 then
-		imgui.BeginChild('##getto', imgui.ImVec2(390, 340), true)
+		imgui.BeginChild('##getto', imgui.ImVec2(440, 370), true)
 		imgui.CenterText(u8'Рендер граффити')
 		imgui.Separator()
 		imgui.Checkbox(u8"Грув", rgrove)
@@ -479,7 +493,7 @@ function imgui.OnDrawFrame()
 		imgui.EndChild()
 	end
 	if selected == 3 then
-		imgui.BeginChild('##information', imgui.ImVec2(390, 340), true)
+		imgui.BeginChild('##information', imgui.ImVec2(440, 370), true)
 		imgui.CenterText(u8'Информация')
 		imgui.Separator()
 		imgui.Link(u8'https://www.blast.hk/members/449591/', u8'Профиль автора на BlastHack')
@@ -496,7 +510,7 @@ function imgui.OnDrawFrame()
 		imgui.EndChild()
 	end
     if selected == 4 then
-		imgui.BeginChild('##settings', imgui.ImVec2(390, 340), true)
+		imgui.BeginChild('##settings', imgui.ImVec2(440, 370), true)
 		imgui.CenterText(u8'Кастомизация')
         imgui.Separator()
 		if imgui.Combo(u8'Цвет линии', combo, colors) then
@@ -529,11 +543,21 @@ function imgui.OnDrawFrame()
 		end
 		imgui.Text(u8'[]-- Чтобы скрипт вернулся в игру, перезагрузите скрипты')
 		imgui.Text(u8'[]-- Или перезайдите в игру')
+		imgui.Separator()
+		if experimental.v then
+			statusexperimetal = u8'Активен'
+		else
+			statusexperimetal = u8'Неактивен'
+		end
+		imgui.Text(u8'Текущий статус экспериментального режима: ' ..statusexperimetal)
+		if imgui.Button(u8"Экспериментальный режим", imgui.ImVec2(170,30)) then -- все это кнопка, на которую активируется 2-е окно.
+			iws()
+	    end
 		imgui.EndChild()
 	end
 	if selected == 5 then
 		--sampAddChatMessage('[debug] code:001 -update process.start',-1)
-		imgui.BeginChild('##update', imgui.ImVec2(390, 340), true)
+		imgui.BeginChild('##update', imgui.ImVec2(440, 370), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
 		if imgui.Button(u8'Загрузить обновление', imgui.ImVec2(140,50)) then
@@ -550,6 +574,33 @@ function imgui.OnDrawFrame()
 	end
 	imgui.End()
 	end
+	if imgui_2.v then -- и вот второе окно
+        imgui.SetNextWindowSize(imgui.ImVec2(330,170), imgui.Cond.FirstUseEver)
+        imgui.SetNextWindowPos(imgui.ImVec2((sw / 2), sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+        imgui.Begin(u8"Экспериментальный режим", nil, imgui.WindowFlags.NoResize + imgui.WindowFlags.NoCollapse)
+		imgui.Text(u8'! -  Не нажимайте на элементы первого окна IMGUI, \nесли у вас открыто окно выбора включения\nэкспериментального режима')
+		imgui.Text(u8'! - Если все таки нажали на первое окно - \nперезагрузите скрипт')
+		if experimental.v == false then
+		    imgui.Text(u8"Вы хотите включить экспериментальный режим?")
+		else
+            imgui.Text(u8"Вы хотите выключить экспериментальный режим?")
+		end
+		if imgui.CustomButton(u8'Подтвердить', imgui.ImVec4(0.26, 0.46, 0.82, 1.00), imgui.ImVec4(0.26, 0.46, 0.82, 1.00), imgui.ImVec4(0.26, 0.46, 0.82, 1.00), imgui.ImVec2(146,40)) then
+			if experimental.v then
+		        experimental.v = false
+			    imgui_2.v = false
+			else
+				experimental.v = true
+				imgui_2.v = false
+			end
+		end
+		save1()
+		imgui.SameLine()
+		if imgui.Button(u8'Отмена', imgui.ImVec2(146,40)) then
+			imgui_2.v = false
+		end
+        imgui.End()
+    end
 end
 
 function theme()
@@ -763,6 +814,7 @@ function save1()
 	mainIni.render.rsem = rsem.v
 	mainIni.render.rryda = rryda.v
     mainIni.render.rderevo = rderevo.v
+	mainIni.render.rodezda = rodezda.v
 	mainIni.ghetto.rgrove = rgrove.v
 	mainIni.ghetto.rballas =  rballas.v
 	mainIni.ghetto.rrifa = rrifa.v
@@ -774,6 +826,7 @@ function save1()
 	mainIni.render.svoiobj2 =  svoiobj2.v
 	mainIni.render.nazvanie1 = nazvanie1.v
 	mainIni.render.nazvanie2 = nazvanie2.v
+	mainIni.settings.experimental = experimental.v
     inicfg.save(mainIni, "MRender.ini")
 end
 
@@ -804,4 +857,40 @@ function imgui.Link(link,name,myfunc)
         imgui.TextColored(imgui.ImVec4(0, 0.3, 0.8, 1), name)
     end
     return resultBtn
+end
+
+--[[временное решение для рендера оленей]]
+function getBodyPartCoordinates(id, handle)
+	local pedptr = getCharPointer(handle)
+	local vec = ffi.new("float[3]")
+	getBonePosition(ffi.cast("void*", pedptr), vec, id, true)
+	return vec[0], vec[1], vec[2]
+end
+
+function olenOn()
+	  local pStSet = sampGetServerSettingsPtr();
+	  NTdist = mem.getfloat(pStSet + 39)
+	  NTwalls = mem.getint8(pStSet + 47)
+	  NTshow = mem.getint8(pStSet + 56)
+	  mem.setfloat(pStSet + 39, 1488.0)
+	  mem.setint8(pStSet + 47, 0)
+	  mem.setint8(pStSet + 56, 1)
+end
+
+function olenOff()
+	local pStSet = sampGetServerSettingsPtr();
+	mem.setfloat(pStSet + 39, NTdist)
+	mem.setint8(pStSet + 47, NTwalls)
+	mem.setint8(pStSet + 56, NTshow)
+end
+
+function imgui.CustomButton(gg, color, colorHovered, colorActive, size)
+    local clr = imgui.Col
+    imgui.PushStyleColor(clr.Button, color)
+    imgui.PushStyleColor(clr.ButtonHovered, colorHovered)
+    imgui.PushStyleColor(clr.ButtonActive, colorActive)
+    if not size then size = imgui.ImVec2(0, 0) end
+    local result = imgui.Button(gg, size)
+    imgui.PopStyleColor(3)
+    return result
 end
