@@ -1,4 +1,4 @@
-script_version('1.8.1')
+script_version('1.8.2')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -32,10 +32,10 @@ end
 
 require 'lib.moonloader'
 local imgui = require 'imgui'
-ffi = require("ffi")
+samp = require 'samp.events'
 local inicfg = require 'inicfg'
-local mem = require "memory"
-local font = renderCreateFont("Brittanica", 10, 5)
+local font = renderCreateFont("Verdana", 9, 5)
+--local font = renderCreateFont("Helvetica", 10, 5)
 local encoding = require 'encoding'
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
@@ -49,7 +49,7 @@ local mainIni = inicfg.load({
 	render = {
 	    rklad = false,
 	    rzakladka = false,
-	    rolen = false,
+	    --rolen = false,
 	    rlen = false,
 	    rhlopok = false,
 	    rsem = false,
@@ -84,7 +84,7 @@ local mainIni = inicfg.load({
 
 local rklad = imgui.ImBool(mainIni.render.rklad)
 local rzakladka = imgui.ImBool(mainIni.render.rzakladka)
-local rolen = imgui.ImBool(mainIni.render.rolen)
+--local rolen = imgui.ImBool(mainIni.render.rolen)
 local rlen = imgui.ImBool(mainIni.render.rlen)
 local rhlopok = imgui.ImBool(mainIni.render.rhlopok)
 local rsem = imgui.ImBool(mainIni.render.rsem)
@@ -150,13 +150,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 			imgui.Process = imgui_2.v
 		end
         wait(0)
-		--graffiti() -- доработка
-		if rolen.v then
-			olenOn(); 
-		end
-		if rolen.v == false then
-			olenOff()
-		end
 		if combo.v == 0 then
 			test = '0xFFFF0000' -- red
 		    elseif combo.v == 1 then
@@ -201,9 +194,9 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
 					local distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					if getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) > 30 then
+					if getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) > 32 then
 					    renderFontDrawText(font, ' Клад(Возможно фейк)\n Дистанция: '..distance, wX, wY , test2)
-				    elseif getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) < 30 then
+				    elseif getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) < 32 then
 						renderFontDrawText(font, ' Клад\n Дистанция: '..distance, wX, wY , test2)
 					end
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
@@ -233,7 +226,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 			end
 			if isObjectOnScreen(v) and rgoblin.v then
 				if num == 3013 then
-				--if num == 3013 then -- ящик гоблина
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
 					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
@@ -254,17 +246,15 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
 				end
 			end
-			--[[if isObjectOnScreen(v) and rolen.v then
-				if num == 19315 then
-					local res, px, py, pz = getObjectCoordinates(v)
-					local wX, wY = convert3DCoordsToScreen(px, py, pz)
+			--[[if rolen.v then
+				if ped == 3150 then
 					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					renderFontDrawText(font, ' Олень\n Дистанция: '..distance, wX, wY , test2)
-					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
+					local x, y = convert3DCoordsToScreen(getCharCoordinates(ped))
+                    renderFontDrawText(font, 'Олень', x, y, -1)
+					renderDrawLine(myPosX, myPosY, x, y, test1, test)
 				end
-			end]]
+			end--]]
 		end
 		for id = 0, 2048 do
             local result = sampIs3dTextDefined( id )
@@ -456,7 +446,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(610, 435), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.8.1(Бета версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.8.2(Бета версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 405), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 72)) then selected = 1 end
@@ -481,14 +471,14 @@ function imgui.OnDrawFrame()
 		imgui.Checkbox(u8"Клады", rklad)
 		imgui.Checkbox(u8"Закладки", rzakladka)
 		imgui.Checkbox(u8"Семена", rsem)
-		if experimental.v then
-		    imgui.Checkbox(u8"Олени(доступно в экспериментальном режиме)", rolen)
-		end
+		--[[if experimental.v then
+		   imgui.Checkbox(u8"Олени(доступно в экспериментальном режиме)", rolen)
+		end]]
 		imgui.Checkbox(u8"Руда", rryda)
 		imgui.Checkbox(u8"Деревья с плодами", rderevo)
 		imgui.Checkbox(u8"Деревья высшего качества", rdrevecina)
 		imgui.Checkbox(u8"Рваная одежда", rodezda)
-		imgui.Checkbox(u8"Ящик гоблина(Гоблинский лес)", rgoblin)
+		imgui.Checkbox(u8"[NEW!] Ящик гоблина(Гоблинский лес)", rgoblin)
 		imgui.Separator()
 		imgui.CenterText(u8'Свои объекты')
 		imgui.Checkbox(u8"Свой объект №1", svoiobj1)
@@ -832,7 +822,7 @@ theme()
 function save1()
     mainIni.render.rklad = rklad.v
 	mainIni.render.rzakladka = rzakladka.v
-	mainIni.render.rolen = rolen.v
+	--mainIni.render.rolen = rolen.v
 	mainIni.render.rlen = rlen.v
 	mainIni.render.rhlopok = rhlopok.v
 	mainIni.render.rsem = rsem.v
@@ -886,7 +876,7 @@ function imgui.Link(link,name,myfunc)
 end
 
 --[[временное решение для рендера оленей]]
-function getBodyPartCoordinates(id, handle)
+--[[function getBodyPartCoordinates(id, handle)
 	local pedptr = getCharPointer(handle)
 	local vec = ffi.new("float[3]")
 	getBonePosition(ffi.cast("void*", pedptr), vec, id, true)
@@ -908,7 +898,7 @@ function olenOff()
 	mem.setfloat(pStSet + 39, NTdist)
 	mem.setint8(pStSet + 47, NTwalls)
 	mem.setint8(pStSet + 56, NTshow)
-end
+end]]
 
 function imgui.CustomButton(gg, color, colorHovered, colorActive, size)
     local clr = imgui.Col
