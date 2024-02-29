@@ -1,4 +1,4 @@
-script_version('1.8.2')
+script_version('1.8.3')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -34,88 +34,76 @@ require 'lib.moonloader'
 local imgui = require 'imgui'
 samp = require 'samp.events'
 local inicfg = require 'inicfg'
-local font = renderCreateFont("Verdana", 9, 5)
---local font = renderCreateFont("Helvetica", 10, 5)
+local font = renderCreateFont("Verdana", 9, 5) --[[Шрифт]]
 local encoding = require 'encoding'
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 local selected = 1
-local colors = {u8"Красный(Default)", u8"Оранжевый", u8"Желтый",u8"Зеленый", u8"Малиновый"}
-local width = {u8"5", u8"7", u8"10(Оптимально)", u8"12", u8"15"}
-local colorsobj = {u8"Белый(Default)", u8"Красный", u8"Оранжевый", u8"Желтый", u8"Зеленый", u8"Малиновый"}
-local colortema = {u8"Черный(Default)", u8"Синий", u8"Фиолетовый"}
+--[[settings colors and lines]]
+local colorObj = '0xFFFFFFFF' --[[Укажите формат цвета , например 0xFFFFFFFF - белый цвет]]
+local linewidth = '4.0' --[[Рекомендованные значения от 3.0 до 6.0]]
+--[[settings colors and lines]]
 
 local mainIni = inicfg.load({
 	render = {
-	    rklad = false,
-	    rzakladka = false,
-	    --rolen = false,
-	    rlen = false,
-	    rhlopok = false,
-	    rsem = false,
-	    rryda = false,
-	    rderevo = false,
-		rdrevecina = false,
-		svoiobj1 = false,
-		svoiobj2 = false,
-		rodezda = false,
-		rgoblin = false, -- new year 2024(ящик гоблина)
-	    nazvanie1 = u8'name1',
-		nazvanie2 = u8'name2'
+	    rtreasure = false,
+	    rbookmark = false,
+	    rdeer = false,
+	    rflax = false,
+	    rcotton = false,
+	    rseeds = false,
+	    rore = false,
+	    rtree = false,
+		rwood = false,
+		myObjectOne = false,
+		myObjectTwo = false,
+		rclothes = false,
+		rmushroom = false,
+	    nameObjectOne = u8'Object name',
+		nameObjectTwo = u8'Object name'
     },
     ghetto = {
 	    rgrove = false,
 	    rballas = false,
 	    rrifa = false,
 	    raztec = false,
-	    rnw = false,
+	    rNightWolves = false,
 	    rvagos = false,
-		rzakrac = false
+		rpaint = false
 	},
 	settings = {
-	    combo = 0,
-	    combo1 = 2,
-	    combo2 = 0,
-	    combo3 = 0,
-	    experimental = false,
-	    nazvanie3 = u8'mrender'
+	    scriptName = u8'mrender',
 	}
 }, 'MRender')
 
-local rklad = imgui.ImBool(mainIni.render.rklad)
-local rzakladka = imgui.ImBool(mainIni.render.rzakladka)
---local rolen = imgui.ImBool(mainIni.render.rolen)
-local rlen = imgui.ImBool(mainIni.render.rlen)
-local rhlopok = imgui.ImBool(mainIni.render.rhlopok)
-local rsem = imgui.ImBool(mainIni.render.rsem)
-local rryda = imgui.ImBool(mainIni.render.rryda)
-local rderevo = imgui.ImBool(mainIni.render.rderevo)
-local rdrevecina = imgui.ImBool(mainIni.render.rdrevecina)
-local svoiobj1 = imgui.ImBool(mainIni.render.svoiobj1)
-local svoiobj2 = imgui.ImBool(mainIni.render.svoiobj2)
-local rodezda = imgui.ImBool(mainIni.render.rodezda)
-local rgoblin = imgui.ImBool(mainIni.render.rgoblin) -- new year 2024(ящик гоблина)
-local nazvanie1 = imgui.ImBuffer(mainIni.render.nazvanie1, 256)
-local nazvanie2 = imgui.ImBuffer(mainIni.render.nazvanie2, 256)
-local nazvanie3 = imgui.ImBuffer(mainIni.settings.nazvanie3, 256)
+local rtreasure = imgui.ImBool(mainIni.render.rtreasure)
+local rbookmark = imgui.ImBool(mainIni.render.rbookmark)
+local rdeer = imgui.ImBool(mainIni.render.rdeer)
+local rflax = imgui.ImBool(mainIni.render.rflax)
+local rcotton = imgui.ImBool(mainIni.render.rcotton)
+local rseeds = imgui.ImBool(mainIni.render.rseeds)
+local rore = imgui.ImBool(mainIni.render.rore)
+local rtree = imgui.ImBool(mainIni.render.rtree)
+local rwood = imgui.ImBool(mainIni.render.rwood)
+local myObjectOne = imgui.ImBool(mainIni.render.myObjectOne)
+local myObjectTwo = imgui.ImBool(mainIni.render.myObjectTwo)
+local rclothes = imgui.ImBool(mainIni.render.rclothes)
+local rmushroom = imgui.ImBool(mainIni.render.rmushroom)
+local nameObjectOne = imgui.ImBuffer(mainIni.render.nameObjectOne, 256)
+local nameObjectTwo = imgui.ImBuffer(mainIni.render.nameObjectTwo, 256)
+local scriptName = imgui.ImBuffer(mainIni.settings.scriptName, 256)
 
 ------------------------------------------------------
 local rgrove = imgui.ImBool(mainIni.ghetto.rgrove)
 local rballas = imgui.ImBool(mainIni.ghetto.rballas)
 local rrifa = imgui.ImBool(mainIni.ghetto.rrifa)
 local raztec = imgui.ImBool(mainIni.ghetto.raztec)
-local rnw = imgui.ImBool(mainIni.ghetto.rnw)
+local rNightWolves = imgui.ImBool(mainIni.ghetto.rNightWolves)
 local rvagos = imgui.ImBool(mainIni.ghetto.rvagos)
-local rzakrac = imgui.ImBool(mainIni.ghetto.rzakrac)
-local combo = imgui.ImInt(mainIni.settings.combo)
-local combo1 = imgui.ImInt(mainIni.settings.combo1)
-local combo2 = imgui.ImInt(mainIni.settings.combo2)
-local combo3 = imgui.ImInt(mainIni.settings.combo3)
-local experimental = imgui.ImBool(mainIni.settings.experimental)
+local rpaint = imgui.ImBool(mainIni.ghetto.rpaint)
 
 
 local main_window_state = imgui.ImBool(false)
-local imgui_2 = imgui.ImBool(false)
 local sw, sh = getScreenResolution()
 
 if not doesFileExist('moonloader/config/MRender.ini') then inicfg.save(mainIni, 'MRender.ini') end
@@ -126,7 +114,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
     
 	local lastver = update():getLastVersion()
     sampAddChatMessage('[MRender] {D5DEDD}Скрипт загружен, версия: '..lastver, 0xFF0000)
-	sampAddChatMessage('[MRender] {D5DEDD}Команда: /'..mainIni.settings.nazvanie3, 0xFF0000)
+	sampAddChatMessage('[MRender] {D5DEDD}Команда: /'..mainIni.settings.scriptName, 0xFF0000)
 	sampAddChatMessage('[MRender] {D5DEDD}Команда для удаления/cброса конфига: /removeconfig', 0xFF0000)
     if thisScript().version ~= lastver then
         sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), скачайте обновление в IMGUI-окне', 0xFF0000)
@@ -136,7 +124,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 		thisScript():reload()
 		sampAddChatMessage('[MRender] {D5DEDD}Конфиг скрипта сброшен!', 0xFF0000)
     end)
-	sampRegisterChatCommand(mainIni.settings.nazvanie3, function()
+	sampRegisterChatCommand(mainIni.settings.scriptName, function()
         main_window_state.v = not main_window_state.v
 
         imgui.Process = main_window_state.v
@@ -145,116 +133,73 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
     imgui.Process = false
 	
 	while true do
-		function iws(arg)
-			imgui_2.v = not imgui_2.v
-			imgui.Process = imgui_2.v
-		end
         wait(0)
-		if combo.v == 0 then
-			test = '0xFFFF0000' -- red
-		    elseif combo.v == 1 then
-			    test = '0xFFFFA500' -- orange
-		    elseif combo.v == 2 then
-			    test = '0xFFFFFF00' -- yellow
-			elseif combo.v == 3 then
-				test = '0xFF008000' -- GREEN
-			elseif combo.v == 4 then
-				test = '0xFFDC143C' -- crimson chapoooooo
-		end
-		if combo1.v == 0 then
-			test1 = '1.0'
-		    elseif combo1.v == 1 then
-			    test1 = '2.0'
-		    elseif combo1.v == 2 then
-			    test1 = '3.0' --
-		    elseif combo1.v == 3 then
-		     	test1 = '4.0'
-		    elseif combo1.v == 4 then
-				test1 = '5.0'
-		end
-		if combo2.v == 0 then
-			test2 = '0xFFFFFFFF' -- white
-		    elseif combo2.v == 1 then
-			    test2 = '0xFFFF0000' -- red
-		    elseif combo2.v == 2 then
-			    test2 = '0xFFFFA500' -- orange
-		    elseif combo2.v == 3 then
-			    test2 = '0xFFFFFF00' -- yellow
-			elseif combo2.v == 4 then
-				test2 = '0xFF008000' -- GREEN
-			elseif combo2.v == 5 then
-				test2 = '0xFFDC143C' -- crimson chapoooooo
-		end
+
+		if rdeer.v then
+		    for k,v in ipairs(getAllChars()) do
+			    if select(2, sampGetPlayerIdByCharHandle(v)) == -1 and v ~= PLAYER_PED and getCharModel(v) == 3150 then
+			        local xp, yp, zp = getCharCoordinates(PLAYER_PED)
+				    local px, py, pz = getCharCoordinates(v)
+				    local wX, wY = convert3DCoordsToScreen(px, py, pz)
+				    local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
+				    distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+				    if isPointOnScreen(px, py, pz, 0) then
+				        renderFontDrawText(font, ' Олень\n Дистанция: '..distance, wX, wY , colorObj)
+				        renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
+				    end
+			    end
+		    end
+	    end
 		for k, v in pairs(getAllObjects()) do
 			local num = getObjectModel(v)
-			if isObjectOnScreen(v) and rklad.v then
+			if isObjectOnScreen(v) and rtreasure.v then
 				if num == 2680 then
 					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					local distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
 					if getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) > 32 then
-					    renderFontDrawText(font, ' Клад(Возможно фейк)\n Дистанция: '..distance, wX, wY , test2)
+					    renderFontDrawText(font, ' Клад(Возможно фейк)\n Дистанция: '..distance, wX, wY , colorObj)
 				    elseif getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) < 32 then
-						renderFontDrawText(font, ' Клад\n Дистанция: '..distance, wX, wY , test2)
+						renderFontDrawText(font, ' Клад\n Дистанция: '..distance, wX, wY , colorObj)
 					end
-					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
+					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
-			if isObjectOnScreen(v) and rsem.v then
+			if isObjectOnScreen(v) and rseeds.v then
 				if num == 859 then
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
 					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
 					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					renderFontDrawText(font, ' Семена\n Дистанция: '..distance, wX, wY , test2)
-					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
+					renderFontDrawText(font, ' Семена\n Дистанция: '..distance, wX, wY , colorObj)
+					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
-            if isObjectOnScreen(v) and rryda.v then
+            if isObjectOnScreen(v) and rore.v then
 				if num == 854 then
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
 					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
 					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					renderFontDrawText(font, ' Руда\n Дистанция: '..distance, wX, wY , test2)
-					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
+					renderFontDrawText(font, ' Руда\n Дистанция: '..distance, wX, wY , colorObj)
+					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
-			if isObjectOnScreen(v) and rgoblin.v then
-				if num == 3013 then
-					local res, px, py, pz = getObjectCoordinates(v)
-					local wX, wY = convert3DCoordsToScreen(px, py, pz)
-					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
-					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					renderFontDrawText(font, ' Ящик гоблина\n Дистанция: '..distance, wX, wY , test2)
-					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
-				end
-			end
-			if isObjectOnScreen(v) and rodezda.v then
+			if isObjectOnScreen(v) and rclothes.v then
 				if num == 18893 or num == 2844 or num == 2819 or num == 18919 or num == 18974 or num == 18946 or num == 2705 or num == 2706 then
 					local res, px, py, pz = getObjectCoordinates(v)
 					local wX, wY = convert3DCoordsToScreen(px, py, pz)
 					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
 					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					renderFontDrawText(font, ' Рваная одежда\n Дистанция: '..distance, wX, wY , test2)
-					renderDrawLine(myPosX, myPosY, wX, wY, test1, test)
+					renderFontDrawText(font, ' Рваная одежда\n Дистанция: '..distance, wX, wY , colorObj)
+					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
-			--[[if rolen.v then
-				if ped == 3150 then
-					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
-					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					local x, y = convert3DCoordsToScreen(getCharCoordinates(ped))
-                    renderFontDrawText(font, 'Олень', x, y, -1)
-					renderDrawLine(myPosX, myPosY, x, y, test1, test)
-				end
-			end--]]
 		end
 		for id = 0, 2048 do
             local result = sampIs3dTextDefined( id )
@@ -262,65 +207,65 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                 local text, color, posX, posY, posZ, distance, ignoreWalls, playerId, vehicleId = sampGet3dTextInfoById( id )
 				distance = string.format("%.0fм", getDistanceBetweenCoords3d(posX, posY, posZ,x2,y2,z2))
 				local texto = text..'\n Дистанция: '..distance
-                if rzakladka.v and text:find("Закладка") then
+                if rbookmark.v and text:find("Закладка") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,' Закладка\n Дистанция: '..distance, wposX, wposY,test2)
+                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
+                        renderFontDrawText(font,' Закладка\n Дистанция: '..distance, wposX, wposY, colorObj)
                     end
                 end
-				if rlen.v and text:find("Лён") then
+				if rflax.v and text:find("Лён") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY,test2)
+                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
+                        renderFontDrawText(font,texto, wposX, wposY, colorObj) 
                     end
                 end
-				if rhlopok.v and text:find("Хлопок") then
+				if rcotton.v and text:find("Хлопок") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY,test2)
+                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
+                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
                     end
                 end
 				--деревья
-				if rderevo.v and text:find("Кокосовое дерево") or rderevo.v and text:find("Сливовое дерево") or rderevo.v and text:find("Яблочное дерево") then
+				if rtree.v and text:find("Кокосовое дерево") or rtree.v and text:find("Сливовое дерево") or rtree.v and text:find("Яблочное дерево") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY,test2)
+                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
                     end
                 end
-				if rdrevecina.v and text:find("Дерево высшего качества") then
+				if rwood.v and text:find("Дерево высшего качества") then
 					local resX, resY = getScreenResolution()
 					local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
 					if isPointOnScreen (posX,posY,posZ,1) then
-					    renderDrawLine(x10, y10, wposX, wposY, test1, test)
+					    renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj)
 					end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,' Дерево выс.качества\n Дистанция: '..distance, wposX, wposY,test2)
+                        renderFontDrawText(font,' Дерево выс.качества\n Дистанция: '..distance, wposX, wposY, colorObj)
                     end
                 end
 				--банды
@@ -330,10 +275,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY,test2)
+                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
                     end
                 end
 				if rballas.v and text:find("Банда: {FFFFFF}East Side Ballas") then
@@ -342,10 +287,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-						renderDrawLine(x10, y10, wposX, wposY, test1, test)
+						renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj)
 					end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY,test2)
+                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
                     end
                 end
 			    if rrifa.v and text:find("Банда: {FFFFFF}The Rifa")  then
@@ -354,10 +299,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY,test2)
+                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
                     end
                 end
 				if raztec.v and text:find("Банда: {FFFFFF}Varrios Los Aztecas") then
@@ -366,22 +311,22 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY,test2)
+                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
                     end
                 end
-				if rnw.v and text:find("Банда: {FFFFFF}Night Wolves") then
+				if rNightWolves.v and text:find("Банда: {FFFFFF}Night Wolves") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY,test2)
+                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
                     end
                 end
 				if rvagos.v and text:find("Банда: {FFFFFF}Los Santos Vagos") then
@@ -390,47 +335,59 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,texto, wposX, wposY,test2)
+						renderFontDrawText(font,texto, wposX, wposY, colorObj)
                     end
                 end
-				if rzakrac.v and text:find("Можно закрасить!") then
+				if rpaint.v and text:find("Можно закрасить!") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,texto, wposX, wposY,test2)
+						renderFontDrawText(font,texto, wposX, wposY, colorObj)
+                    end
+                end
+				if rmushroom.v and text:find("Срезать гриб") then
+                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
+                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+                    local resX, resY = getScreenResolution()
+					if isPointOnScreen (posX,posY,posZ,1) then
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
+                        renderFontDrawText(font,' Гриб\n Дистанция: '..distance, wposX, wposY, colorObj)
                     end
                 end
 				-------------------------------Свои obj-----------------------------------
-				if svoiobj1.v and text:find(u8:decode(nazvanie1.v)) then 
+				if myObjectOne.v and text:find(u8:decode(nameObjectOne.v)) then 
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-						renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+						renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
 					end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,texto, wposX, wposY,test2)
+						renderFontDrawText(font,texto, wposX, wposY, colorObj)
                     end
                 end
-				if svoiobj2.v and text:find(u8:decode(nazvanie2.v)) then 
+				if myObjectTwo.v and text:find(u8:decode(nameObjectTwo.v)) then 
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
                     local resX, resY = getScreenResolution()
 					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, test1, test) 
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,texto, wposX, wposY,test2)
+						renderFontDrawText(font,texto, wposX, wposY, colorObj)
                     end
                 end
 			end
@@ -446,7 +403,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(610, 435), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.8.2(Бета версия, с кастомизацией)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.8.3(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 405), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 72)) then selected = 1 end
@@ -455,9 +412,7 @@ function imgui.OnDrawFrame()
 	imgui.Separator()
 	if imgui.Button(u8'Информация', imgui.ImVec2(135, 72)) then selected = 3 end
 	imgui.Separator()
-    if imgui.Button(u8'Кастомизация', imgui.ImVec2(135, 72)) then selected = 4
-		sampAddChatMessage('[Кастомизация] После смены цвета окна в скрипте перезагрузите скрипты или перезайдите в игру', 0xFFFF00)
-	end
+	if imgui.Button(u8'Кастомизация', imgui.ImVec2(135, 72)) then selected = 4 end
 	imgui.Separator()
 	if imgui.Button(u8'Авто-обновление', imgui.ImVec2(135, 45)) then selected = 5 end
 	imgui.EndChild()
@@ -466,33 +421,30 @@ function imgui.OnDrawFrame()
 		imgui.BeginChild('##render', imgui.ImVec2(440, 405), true)
 		imgui.CenterText(u8'Основное')
 		imgui.Separator()
-		imgui.Checkbox(u8"Лен", rlen)
-		imgui.Checkbox(u8"Хлопок", rhlopok)
-		imgui.Checkbox(u8"Клады", rklad)
-		imgui.Checkbox(u8"Закладки", rzakladka)
-		imgui.Checkbox(u8"Семена", rsem)
-		--[[if experimental.v then
-		   imgui.Checkbox(u8"Олени(доступно в экспериментальном режиме)", rolen)
-		end]]
-		imgui.Checkbox(u8"Руда", rryda)
-		imgui.Checkbox(u8"Деревья с плодами", rderevo)
-		imgui.Checkbox(u8"Деревья высшего качества", rdrevecina)
-		imgui.Checkbox(u8"Рваная одежда", rodezda)
-		imgui.Checkbox(u8"[NEW!] Ящик гоблина(Гоблинский лес)", rgoblin)
+		imgui.Checkbox(u8"Лен", rflax)
+		imgui.Checkbox(u8"Хлопок", rcotton)
+		imgui.Checkbox(u8"Клады", rtreasure)
+		imgui.Checkbox(u8"Закладки", rbookmark)
+		imgui.Checkbox(u8"Семена", rseeds)
+		imgui.Checkbox(u8"[NEW!] Олени", rdeer)
+		imgui.Checkbox(u8"Руда", rore)
+		imgui.Checkbox(u8"Деревья с плодами", rtree)
+		imgui.Checkbox(u8"Деревья высшего качества", rwood)
+		imgui.Checkbox(u8"Рваная одежда", rclothes)
+		imgui.Checkbox(u8"[NEW!] Грибы", rmushroom)
 		imgui.Separator()
 		imgui.CenterText(u8'Свои объекты')
-		imgui.Checkbox(u8"Свой объект №1", svoiobj1)
+		imgui.Checkbox(u8"Свой объект №1", myObjectOne)
 		imgui.Text(u8'Название для obj №1')
 		imgui.SameLine()
-		imgui.InputText(u8'##Название объекта для рендера №1', nazvanie1)
-		imgui.Checkbox(u8"Свой объект №2", svoiobj2)
+		imgui.InputText(u8'##Название объекта для рендера №1', nameObjectOne)
+		imgui.Checkbox(u8"Свой объект №2", myObjectTwo)
 		imgui.Text(u8'Название для obj №2')
 		imgui.SameLine()
-		imgui.InputText(u8'##Название объекта для рендера №2', nazvanie2)
-		save1()
+		imgui.InputText(u8'##Название объекта для рендера №2', nameObjectTwo)
+		saving()
 		imgui.EndChild()
-	end
-	if selected == 2 then
+    elseif selected == 2 then
 		imgui.BeginChild('##getto', imgui.ImVec2(440, 405), true)
 		imgui.CenterText(u8'Рендер граффити')
 		imgui.Separator()
@@ -500,20 +452,18 @@ function imgui.OnDrawFrame()
 	    imgui.Checkbox(u8"Баллас", rballas)
 	    imgui.Checkbox(u8"Рифа", rrifa)
 	    imgui.Checkbox(u8"Ацтек", raztec)
-	    imgui.Checkbox(u8"Ночные волки", rnw)
+	    imgui.Checkbox(u8"Ночные волки", rNightWolves)
 	    imgui.Checkbox(u8"Вагос", rvagos)
-		imgui.Checkbox(u8"[NEW!] Показать только граффити которые можно закрасить", rzakrac)
-		--imgui.Text(u8"Если вы включили показание граффити которые можно закрасить)
-		save1()
+		imgui.Checkbox(u8"[NEW!] Показать только граффити которые можно закрасить", rpaint)
+		saving()
 		imgui.EndChild()
-	end
-	if selected == 3 then
+    elseif selected == 3 then
 		imgui.BeginChild('##information', imgui.ImVec2(440, 405), true)
 		imgui.CenterText(u8'Информация')
 		imgui.Separator()
 		imgui.Link(u8'https://www.blast.hk/members/449591/', u8'Профиль автора на BlastHack')
 		imgui.Link('https://t.me/rendersamp', u8'Telegram-канал скрипта')
-		imgui.Text(u8'Запустить скрипт: /'..nazvanie3.v)
+		imgui.Text(u8'Запустить скрипт: /'..scriptName.v)
 		imgui.Text(u8'--[] Если скрипт начал неправильно работать - сбросите конфиг')
 		imgui.Text(u8'--[] Для сброса конфига - используйте команду: /removeconfig')
 		imgui.Separator()
@@ -522,30 +472,12 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'Это связано с обновлением кастомизации')
 		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 7%')
 		imgui.EndChild()
-	end
-    if selected == 4 then
+	elseif selected == 4 then
 		imgui.BeginChild('##settings', imgui.ImVec2(440, 405), true)
 		imgui.CenterText(u8'Кастомизация')
         imgui.Separator()
-		if imgui.Combo(u8'Цвет линии', combo, colors) then
-		    mainIni.settings.combo = combo.v
-			inicfg.save(mainIni, "MRender.ini")
-	    end
-		if imgui.Combo(u8'Ширина линии', combo1, width) then
-		    mainIni.settings.combo1 = combo1.v
-			inicfg.save(mainIni, "MRender.ini")
-	    end
-		if imgui.Combo(u8'Цвет названия(obj)', combo2, colorsobj) then
-		    mainIni.settings.combo2 = combo2.v
-			inicfg.save(mainIni, "MRender.ini")
-	    end
-		if imgui.Combo(u8'Цвет окна скрипта', combo3, colortema) then
-		    mainIni.settings.combo3 = combo3.v
-			inicfg.save(mainIni, "MRender.ini")
-	    end
-		imgui.Separator()
-		if imgui.InputText(u8'##Название скрипта', nazvanie3) then
-			mainIni.settings.nazvanie3 = nazvanie3.v
+		if imgui.InputText(u8'##Название скрипта', scriptName) then
+			mainIni.settings.scriptName = scriptName.v
 			inicfg.save(mainIni, "MRender.ini")
 		end
 		imgui.Text(u8'Указывайте команду активации без / (!!!)')
@@ -558,19 +490,8 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'[]-- Чтобы скрипт вернулся в игру, перезагрузите скрипты')
 		imgui.Text(u8'[]-- Или перезайдите в игру')
 		imgui.Separator()
-		if experimental.v then
-			statusexperimetal = u8'Активен'
-		else
-			statusexperimetal = u8'Неактивен'
-		end
-		imgui.Text(u8'Текущий статус экспериментального режима: ' ..statusexperimetal)
-		if imgui.Button(u8"Экспериментальный режим", imgui.ImVec2(170,30)) then -- все это кнопка, на которую активируется 2-е окно.
-			iws()
-	    end
 		imgui.EndChild()
-	end
-	if selected == 5 then
-		--sampAddChatMessage('[debug] code:001 -update process.start',-1)
+	elseif selected == 5 then
 		imgui.BeginChild('##update', imgui.ImVec2(440, 405), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
@@ -588,37 +509,9 @@ function imgui.OnDrawFrame()
 	end
 	imgui.End()
 	end
-	if imgui_2.v then -- и вот второе окно
-        imgui.SetNextWindowSize(imgui.ImVec2(330,170), imgui.Cond.FirstUseEver)
-        imgui.SetNextWindowPos(imgui.ImVec2((sw / 2), sh / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-        imgui.Begin(u8"Экспериментальный режим", nil, imgui.WindowFlags.NoResize + imgui.WindowFlags.NoCollapse)
-		imgui.Text(u8'! -  Не нажимайте на элементы первого окна IMGUI, \nесли у вас открыто окно выбора включения\nэкспериментального режима')
-		imgui.Text(u8'! - Если все таки нажали на первое окно - \nперезагрузите скрипт')
-		if experimental.v == false then
-		    imgui.Text(u8"Вы хотите включить экспериментальный режим?")
-		else
-            imgui.Text(u8"Вы хотите выключить экспериментальный режим?")
-		end
-		if imgui.CustomButton(u8'Подтвердить', imgui.ImVec4(0.26, 0.46, 0.82, 1.00), imgui.ImVec4(0.26, 0.46, 0.82, 1.00), imgui.ImVec4(0.26, 0.46, 0.82, 1.00), imgui.ImVec2(146,40)) then
-			if experimental.v then
-		        experimental.v = false
-			    imgui_2.v = false
-			else
-				experimental.v = true
-				imgui_2.v = false
-			end
-		end
-		save1()
-		imgui.SameLine()
-		if imgui.Button(u8'Отмена', imgui.ImVec2(146,40)) then
-			imgui_2.v = false
-		end
-        imgui.End()
-    end
 end
 
 function theme()
-	if combo3.v == 0 then
 	imgui.SwitchContext()
 	local style = imgui.GetStyle()
 	local colors = style.Colors
@@ -640,7 +533,7 @@ function theme()
 	style.GrabMinSize = 20.0
 	style.GrabRounding = 5.0
 	style.WindowTitleAlign = ImVec2(0.5, 0.5)
-	style.ButtonTextAlign = ImVec2(0.5, 0.5) -- Значения от 0 до 1
+	style.ButtonTextAlign = ImVec2(0.5, 0.5)
 
 	colors[clr.Text]                    = ImVec4(1.00, 1.00, 1.00, 1.00)
 	colors[clr.TextDisabled]            = ImVec4(0.20, 0.20, 0.20, 1.00)
@@ -682,167 +575,33 @@ function theme()
 	colors[clr.PlotHistogramHovered]    = ImVec4(0.20, 0.20, 0.20, 1.00)
 	colors[clr.TextSelectedBg]          = ImVec4(0.05, 0.05, 0.05, 1.00)
 	colors[clr.ModalWindowDarkening]    = ImVec4(1.00, 1.00, 1.00, 1.00)
-
-	elseif combo3.v == 1 then
-	imgui.SwitchContext()
-    local style = imgui.GetStyle()
-	local colors = style.Colors
-	local clr = imgui.Col
-	local ImVec4 = imgui.ImVec4
-	local ImVec2 = imgui.ImVec2
-
-	style.WindowPadding = ImVec2(8, 8)
-	style.WindowRounding = 5.0
-	style.ChildWindowRounding = 5.0
-	style.FramePadding = ImVec2(2, 2)
-	style.FrameRounding = 5.0
-	style.ItemSpacing = ImVec2(5, 5)
-	style.ItemInnerSpacing = ImVec2(5, 5)
-	style.TouchExtraPadding = ImVec2(0, 0)
-	style.IndentSpacing = 5.0
-	style.ScrollbarSize = 13.0
-	style.ScrollbarRounding = 5.0
-	style.GrabMinSize = 20.0
-	style.GrabRounding = 5.0
-	style.WindowTitleAlign = ImVec2(0.5, 0.5)
-	style.ButtonTextAlign = ImVec2(0.5, 0.5) -- Значения от 0 до 1
-
-    colors[clr.Text] = ImVec4(0.860, 0.930, 0.890, 0.78)
-    colors[clr.TextDisabled] = ImVec4(0.860, 0.930, 0.890, 0.28)
-    colors[clr.Text]                 = ImVec4(0.86, 0.93, 0.89, 0.78)
-    colors[clr.TextDisabled]         = ImVec4(0.36, 0.42, 0.47, 1.00)
-    colors[clr.WindowBg]             = ImVec4(0.11, 0.15, 0.17, 1.00)
-    colors[clr.ChildWindowBg]        = ImVec4(0.15, 0.18, 0.22, 1.00)
-    colors[clr.PopupBg]              = ImVec4(0.08, 0.08, 0.08, 0.94)
-    colors[clr.Border]               = ImVec4(0.43, 0.43, 0.50, 0.50)
-    colors[clr.BorderShadow]         = ImVec4(0.00, 0.00, 0.00, 0.00)
-    colors[clr.FrameBg]              = ImVec4(0.20, 0.25, 0.29, 1.00)
-    colors[clr.FrameBgHovered]       = ImVec4(0.12, 0.20, 0.28, 1.00)
-    colors[clr.FrameBgActive]        = ImVec4(0.09, 0.12, 0.14, 1.00)
-    colors[clr.TitleBg]              = ImVec4(0.09, 0.12, 0.14, 0.65)
-    colors[clr.TitleBgActive]        = ImVec4(0.11, 0.30, 0.59, 1.00)
-    colors[clr.TitleBgCollapsed]     = ImVec4(0.00, 0.00, 0.00, 0.51)
-    colors[clr.MenuBarBg]            = ImVec4(0.15, 0.18, 0.22, 1.00)
-    colors[clr.ScrollbarBg]          = ImVec4(0.02, 0.02, 0.02, 0.39)
-    colors[clr.ScrollbarGrab]        = ImVec4(0.20, 0.25, 0.29, 1.00)
-    colors[clr.ScrollbarGrabHovered] = ImVec4(0.18, 0.22, 0.25, 1.00)
-    colors[clr.ScrollbarGrabActive]  = ImVec4(0.09, 0.21, 0.31, 1.00)
-    colors[clr.ComboBg]              = ImVec4(0.20, 0.25, 0.29, 1.00)
-    colors[clr.CheckMark]            = ImVec4(0.28, 0.56, 1.00, 1.00)
-    colors[clr.SliderGrab]           = ImVec4(0.28, 0.56, 1.00, 1.00)
-    colors[clr.SliderGrabActive]     = ImVec4(0.37, 0.61, 1.00, 1.00)
-    colors[clr.Button]               = ImVec4(0.08, 0.33, 0.55, 1.00)
-    colors[clr.ButtonHovered]        = ImVec4(0.28, 0.56, 1.00, 1.00)
-    colors[clr.ButtonActive]         = ImVec4(0.06, 0.53, 0.98, 1.00)
-    colors[clr.Header]               = ImVec4(0.20, 0.25, 0.29, 0.55)
-    colors[clr.HeaderHovered]        = ImVec4(0.26, 0.59, 0.98, 0.80)
-    colors[clr.HeaderActive]         = ImVec4(0.26, 0.59, 0.98, 1.00)
-    colors[clr.Separator]            = ImVec4(0.50, 0.50, 0.50, 1.00)
-    colors[clr.SeparatorHovered]     = ImVec4(0.60, 0.60, 0.70, 1.00)
-    colors[clr.SeparatorActive]      = ImVec4(0.70, 0.70, 0.90, 1.00)
-    colors[clr.ResizeGrip]           = ImVec4(0.26, 0.59, 0.98, 0.25)
-    colors[clr.ResizeGripHovered]    = ImVec4(0.26, 0.59, 0.98, 0.67)
-    colors[clr.ResizeGripActive]     = ImVec4(0.06, 0.05, 0.07, 1.00)
-    colors[clr.CloseButton]          = ImVec4(0.40, 0.39, 0.38, 0.16)
-    colors[clr.CloseButtonHovered]   = ImVec4(0.40, 0.39, 0.38, 0.39)
-    colors[clr.CloseButtonActive]    = ImVec4(0.40, 0.39, 0.38, 1.00)
-    colors[clr.PlotLines]            = ImVec4(0.61, 0.61, 0.61, 1.00)
-    colors[clr.PlotLinesHovered]     = ImVec4(1.00, 0.43, 0.35, 1.00)
-    colors[clr.PlotHistogram]        = ImVec4(0.90, 0.70, 0.00, 1.00)
-    colors[clr.PlotHistogramHovered] = ImVec4(1.00, 0.60, 0.00, 1.00)
-    colors[clr.TextSelectedBg]       = ImVec4(0.25, 1.00, 0.00, 0.43)
-    colors[clr.ModalWindowDarkening] = ImVec4(1.00, 0.98, 0.95, 0.73)
-	elseif combo3.v == 2 then
-		imgui.SwitchContext()
-        local style = imgui.GetStyle()
-	    local colors = style.Colors
-	    local clr = imgui.Col
-	    local ImVec4 = imgui.ImVec4
-	    local ImVec2 = imgui.ImVec2
-
-	    style.WindowPadding = ImVec2(8, 8)
-	    style.WindowRounding = 5.0
-	    style.ChildWindowRounding = 5.0
-	    style.FramePadding = ImVec2(2, 2)
-	    style.FrameRounding = 5.0
-	    style.ItemSpacing = ImVec2(5, 5)
-	    style.ItemInnerSpacing = ImVec2(5, 5)
-	    style.TouchExtraPadding = ImVec2(0, 0)
-	    style.IndentSpacing = 5.0
-	    style.ScrollbarSize = 13.0
-	    style.ScrollbarRounding = 5.0
-	    style.GrabMinSize = 20.0
-	    style.GrabRounding = 5.0
-	    style.WindowTitleAlign = ImVec2(0.5, 0.5)
-	    style.ButtonTextAlign = ImVec2(0.5, 0.5) -- Значения от 0 до 1 
-		
-		colors[clr.WindowBg]              = ImVec4(0, 0, 0, 1);
-		colors[clr.ChildWindowBg]         = ImVec4(0, 0, 0, 1);
-		colors[clr.PopupBg]               = ImVec4(0.05, 0.05, 0.10, 0.90);
-		colors[clr.Border]                = ImVec4(0.89, 0.85, 0.92, 0.30);
-		colors[clr.BorderShadow]          = ImVec4(0.00, 0.00, 0.00, 0.00);
-		colors[clr.FrameBg]               = ImVec4(0.12, 0.12, 0.12, 0.94);
-		colors[clr.FrameBgHovered]        = ImVec4(0.41, 0.19, 0.63, 0.68);
-		colors[clr.FrameBgActive]         = ImVec4(0.41, 0.19, 0.63, 1.00);
-		colors[clr.TitleBg]               = ImVec4(0.41, 0.19, 0.63, 0.45);
-		colors[clr.TitleBgCollapsed]      = ImVec4(0.41, 0.19, 0.63, 0.35);
-		colors[clr.TitleBgActive]         = ImVec4(0.41, 0.19, 0.63, 0.78);
-		colors[clr.MenuBarBg]             = ImVec4(0.30, 0.20, 0.39, 0.57);
-		colors[clr.ScrollbarBg]           = ImVec4(0.04, 0.04, 0.04, 1.00);
-		colors[clr.ScrollbarGrab]         = ImVec4(0.41, 0.19, 0.63, 0.31);
-		colors[clr.ScrollbarGrabHovered]  = ImVec4(0.41, 0.19, 0.63, 0.78);
-		colors[clr.ScrollbarGrabActive]   = ImVec4(0.41, 0.19, 0.63, 1.00);
-		colors[clr.ComboBg]               = ImVec4(0.30, 0.20, 0.39, 1.00);
-		colors[clr.CheckMark]             = ImVec4(0.56, 0.61, 1.00, 1.00);
-		colors[clr.SliderGrab]            = ImVec4(0.28, 0.28, 0.28, 1.00);
-		colors[clr.SliderGrabActive]      = ImVec4(0.35, 0.35, 0.35, 1.00);
-		colors[clr.Button]                = ImVec4(0.41, 0.19, 0.63, 0.44);
-		colors[clr.ButtonHovered]         = ImVec4(0.41, 0.19, 0.63, 0.86);
-		colors[clr.ButtonActive]          = ImVec4(0.64, 0.33, 0.94, 1.00);
-		colors[clr.Header]                = ImVec4(0.41, 0.19, 0.63, 0.76);
-		colors[clr.HeaderHovered]         = ImVec4(0.41, 0.19, 0.63, 0.86);
-		colors[clr.HeaderActive]          = ImVec4(0.41, 0.19, 0.63, 1.00);
-		colors[clr.ResizeGrip]            = ImVec4(0.41, 0.19, 0.63, 0.20);
-		colors[clr.ResizeGripHovered]     = ImVec4(0.41, 0.19, 0.63, 0.78);
-		colors[clr.ResizeGripActive]      = ImVec4(0.41, 0.19, 0.63, 1.00);
-		colors[clr.CloseButton]           = ImVec4(1.00, 1.00, 1.00, 0.75);
-		colors[clr.CloseButtonHovered]    = ImVec4(0.88, 0.74, 1.00, 0.59);
-		colors[clr.CloseButtonActive]     = ImVec4(0.88, 0.85, 0.92, 1.00);
-		colors[clr.PlotLines]             = ImVec4(0.89, 0.85, 0.92, 0.63);
-		colors[clr.PlotLinesHovered]      = ImVec4(0.41, 0.19, 0.63, 1.00);
-		colors[clr.PlotHistogram]         = ImVec4(0.89, 0.85, 0.92, 0.63);
-		colors[clr.PlotHistogramHovered]  = ImVec4(0.41, 0.19, 0.63, 1.00);
-		colors[clr.TextSelectedBg]        = ImVec4(0.41, 0.19, 0.63, 0.43);
-		colors[clr.ModalWindowDarkening]  = ImVec4(0.20, 0.20, 0.20, 0.35);
-	end
 end
 theme()
 
 
-function save1()
-    mainIni.render.rklad = rklad.v
-	mainIni.render.rzakladka = rzakladka.v
-	--mainIni.render.rolen = rolen.v
-	mainIni.render.rlen = rlen.v
-	mainIni.render.rhlopok = rhlopok.v
-	mainIni.render.rsem = rsem.v
-	mainIni.render.rryda = rryda.v
-    mainIni.render.rderevo = rderevo.v
-	mainIni.render.rodezda = rodezda.v
-	mainIni.render.rgoblin = rgoblin.v -- new year 2024
+function saving()
+    mainIni.render.rtreasure = rtreasure.v
+	mainIni.render.rbookmark = rbookmark.v
+	mainIni.render.rdeer = rdeer.v
+	mainIni.render.rflax = rflax.v
+	mainIni.render.rcotton = rcotton.v
+	mainIni.render.rseeds = rseeds.v
+	mainIni.render.rore = rore.v
+    mainIni.render.rtree = rtree.v
+	mainIni.render.rclothes = rclothes.v
+	mainIni.render.rmushroom = rmushroom.v
 	mainIni.ghetto.rgrove = rgrove.v
 	mainIni.ghetto.rballas =  rballas.v
 	mainIni.ghetto.rrifa = rrifa.v
 	mainIni.ghetto.raztec =  raztec.v
-	mainIni.ghetto.rnw = rnw.v
+	mainIni.ghetto.rNightWolves = rNightWolves.v
 	mainIni.ghetto.rvagos =  rvagos.v
-	mainIni.ghetto.rzakrac =  rzakrac.v
-	mainIni.render.rdrevecina =  rdrevecina.v
-	mainIni.render.svoiobj1 =  svoiobj1.v
-	mainIni.render.svoiobj2 =  svoiobj2.v
-	mainIni.render.nazvanie1 = nazvanie1.v
-	mainIni.render.nazvanie2 = nazvanie2.v
-	mainIni.settings.experimental = experimental.v
+	mainIni.ghetto.rpaint =  rpaint.v
+	mainIni.render.rwood =  rwood.v
+	mainIni.render.myObjectOne =  myObjectOne.v
+	mainIni.render.myObjectTwo =  myObjectTwo.v
+	mainIni.render.nameObjectOne = nameObjectOne.v
+	mainIni.render.nameObjectTwo = nameObjectTwo.v
     inicfg.save(mainIni, "MRender.ini")
 end
 
@@ -875,31 +634,6 @@ function imgui.Link(link,name,myfunc)
     return resultBtn
 end
 
---[[временное решение для рендера оленей]]
---[[function getBodyPartCoordinates(id, handle)
-	local pedptr = getCharPointer(handle)
-	local vec = ffi.new("float[3]")
-	getBonePosition(ffi.cast("void*", pedptr), vec, id, true)
-	return vec[0], vec[1], vec[2]
-end
-
-function olenOn()
-	  local pStSet = sampGetServerSettingsPtr();
-	  NTdist = mem.getfloat(pStSet + 39)
-	  NTwalls = mem.getint8(pStSet + 47)
-	  NTshow = mem.getint8(pStSet + 56)
-	  mem.setfloat(pStSet + 39, 1488.0)
-	  mem.setint8(pStSet + 47, 0)
-	  mem.setint8(pStSet + 56, 1)
-end
-
-function olenOff()
-	local pStSet = sampGetServerSettingsPtr();
-	mem.setfloat(pStSet + 39, NTdist)
-	mem.setint8(pStSet + 47, NTwalls)
-	mem.setint8(pStSet + 56, NTshow)
-end]]
-
 function imgui.CustomButton(gg, color, colorHovered, colorActive, size)
     local clr = imgui.Col
     imgui.PushStyleColor(clr.Button, color)
@@ -912,12 +646,12 @@ function imgui.CustomButton(gg, color, colorHovered, colorActive, size)
 end
 
 --[[function graffiti() -- дорабатывается
-	if rzakrac.v then
+	if rpaint.v then
 		rvagos.v = false
 		rgrove.v = false
         rballas.v = false
         rrifa.v = false
         raztec.v = false
-        rnw.v = false
+        rNightWolves.v = false
 	end
 end--]]
