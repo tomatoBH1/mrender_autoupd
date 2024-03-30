@@ -1,4 +1,4 @@
-script_version('1.8.3')
+script_version('1.8.4')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -34,14 +34,14 @@ require 'lib.moonloader'
 local imgui = require 'imgui'
 samp = require 'samp.events'
 local inicfg = require 'inicfg'
-local font = renderCreateFont("Verdana", 9, 5) --[[Шрифт]]
+local font = renderCreateFont("Tahoma", 9, 5) --[[Шрифт]]
 local encoding = require 'encoding'
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 local selected = 1
 --[[settings colors and lines]]
 local colorObj = '0xFFFFFFFF' --[[Укажите формат цвета , например 0xFFFFFFFF - белый цвет]]
-local linewidth = '4.0' --[[Рекомендованные значения от 3.0 до 6.0]]
+local linewidth = '3.5' --[[Рекомендованные значения от 3.0 до 5.0]]
 --[[settings colors and lines]]
 
 local mainIni = inicfg.load({
@@ -59,6 +59,7 @@ local mainIni = inicfg.load({
 		myObjectTwo = false,
 		rclothes = false,
 		rmushroom = false,
+		rgift = false,
 	    nameObjectOne = u8'Object name',
 		nameObjectTwo = u8'Object name'
     },
@@ -89,6 +90,7 @@ local myObjectOne = imgui.ImBool(mainIni.render.myObjectOne)
 local myObjectTwo = imgui.ImBool(mainIni.render.myObjectTwo)
 local rclothes = imgui.ImBool(mainIni.render.rclothes)
 local rmushroom = imgui.ImBool(mainIni.render.rmushroom)
+local rgift= imgui.ImBool(mainIni.render.rgift)
 local nameObjectOne = imgui.ImBuffer(mainIni.render.nameObjectOne, 256)
 local nameObjectTwo = imgui.ImBuffer(mainIni.render.nameObjectTwo, 256)
 local scriptName = imgui.ImBuffer(mainIni.settings.scriptName, 256)
@@ -200,13 +202,25 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
+			if isObjectOnScreen(v) and rgift.v then
+				if num == 19054 or num == 19055 or num == 19056 or num == 19057 or num == 19058 then
+					local res, px, py, pz = getObjectCoordinates(v)
+					local wX, wY = convert3DCoordsToScreen(px, py, pz)
+					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
+					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
+					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					renderFontDrawText(font, ' Подарок\n Дистанция: '..distance, wX, wY , colorObj)
+					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
+				end
+			end
 		end
 		for id = 0, 2048 do
             local result = sampIs3dTextDefined( id )
             if result then
                 local text, color, posX, posY, posZ, distance, ignoreWalls, playerId, vehicleId = sampGet3dTextInfoById( id )
 				distance = string.format("%.0fм", getDistanceBetweenCoords3d(posX, posY, posZ,x2,y2,z2))
-				local texto = text..'\n Дистанция: '..distance
+				local textograffiti = text..'\n\n         - (Дистанция: ' ..distance..') -'
+				local texto = text..'\n - (Дистанция: ' ..distance..') -'
                 if rbookmark.v and text:find("Закладка") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -269,7 +283,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                     end
                 end
 				--банды
-				if rgrove.v and text:find("Банда: {FFFFFF}Grove Street") then
+				if rgrove.v and text:find("Банда: {ff6666}{009327}Grove Street") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -278,10 +292,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
+                        renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
                     end
                 end
-				if rballas.v and text:find("Банда: {FFFFFF}East Side Ballas") then
+				if rballas.v and text:find("Банда: {ff6666}{CC00CC}East Side Ballas") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -290,10 +304,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj)
 					end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
+                        renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
                     end
                 end
-			    if rrifa.v and text:find("Банда: {FFFFFF}The Rifa")  then
+			    if rrifa.v and text:find("Банда: {ff6666}{6666FF}The Rifa")  then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -302,10 +316,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
+                        renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
                     end
                 end
-				if raztec.v and text:find("Банда: {FFFFFF}Varrios Los Aztecas") then
+				if raztec.v and text:find("Банда: {ff6666}{00FFE2}Varrios Los Aztecas") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -314,10 +328,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
+                        renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
                     end
                 end
-				if rNightWolves.v and text:find("Банда: {FFFFFF}Night Wolves") then
+				if rNightWolves.v and text:find("Банда: {ff6666}{A87878}Night Wolves") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -326,10 +340,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
+                        renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
                     end
                 end
-				if rvagos.v and text:find("Банда: {FFFFFF}Los Santos Vagos") then
+				if rvagos.v and text:find("Банда: {ff6666}{D1DB1C}Los Santos Vagos") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -338,7 +352,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,texto, wposX, wposY, colorObj)
+						renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
                     end
                 end
 				if rpaint.v and text:find("Можно закрасить!") then
@@ -403,7 +417,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(610, 435), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.8.3(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.8.4(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 405), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 72)) then selected = 1 end
@@ -431,7 +445,8 @@ function imgui.OnDrawFrame()
 		imgui.Checkbox(u8"Деревья с плодами", rtree)
 		imgui.Checkbox(u8"Деревья высшего качества", rwood)
 		imgui.Checkbox(u8"Рваная одежда", rclothes)
-		imgui.Checkbox(u8"[NEW!] Грибы", rmushroom)
+		imgui.Checkbox(u8"Грибы", rmushroom)
+		imgui.Checkbox(u8"[NEW!] Подарки", rgift)
 		imgui.Separator()
 		imgui.CenterText(u8'Свои объекты')
 		imgui.Checkbox(u8"Свой объект №1", myObjectOne)
@@ -454,7 +469,7 @@ function imgui.OnDrawFrame()
 	    imgui.Checkbox(u8"Ацтек", raztec)
 	    imgui.Checkbox(u8"Ночные волки", rNightWolves)
 	    imgui.Checkbox(u8"Вагос", rvagos)
-		imgui.Checkbox(u8"[NEW!] Показать только граффити которые можно закрасить", rpaint)
+		imgui.Checkbox(u8"[Временно не работает] Показать только граффити которые можно закрасить", rpaint)
 		saving()
 		imgui.EndChild()
     elseif selected == 3 then
@@ -582,6 +597,7 @@ theme()
 function saving()
     mainIni.render.rtreasure = rtreasure.v
 	mainIni.render.rbookmark = rbookmark.v
+	mainIni.render.rgift = rgift.v
 	mainIni.render.rdeer = rdeer.v
 	mainIni.render.rflax = rflax.v
 	mainIni.render.rcotton = rcotton.v
