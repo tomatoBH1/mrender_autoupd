@@ -1,4 +1,4 @@
-script_version('1.8.4')
+script_version('1.8.5')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -34,11 +34,13 @@ require 'lib.moonloader'
 local imgui = require 'imgui'
 samp = require 'samp.events'
 local inicfg = require 'inicfg'
+local fa = require 'fAwesome5'
 local font = renderCreateFont("Tahoma", 9, 5) --[[Шрифт]]
 local encoding = require 'encoding'
 encoding.default = 'CP1251'
 u8 = encoding.UTF8
 local selected = 1
+imgui.Spinner = require('imgui_addons').Spinner
 --[[settings colors and lines]]
 local colorObj = '0xFFFFFFFF' --[[Укажите формат цвета , например 0xFFFFFFFF - белый цвет]]
 local linewidth = '3.5' --[[Рекомендованные значения от 3.0 до 5.0]]
@@ -74,6 +76,7 @@ local mainIni = inicfg.load({
 	},
 	settings = {
 	    scriptName = u8'mrender',
+		clue = false,
 	}
 }, 'MRender')
 
@@ -94,6 +97,7 @@ local rgift= imgui.ImBool(mainIni.render.rgift)
 local nameObjectOne = imgui.ImBuffer(mainIni.render.nameObjectOne, 256)
 local nameObjectTwo = imgui.ImBuffer(mainIni.render.nameObjectTwo, 256)
 local scriptName = imgui.ImBuffer(mainIni.settings.scriptName, 256)
+local clue = imgui.ImBool(mainIni.settings.clue)
 
 ------------------------------------------------------
 local rgrove = imgui.ImBool(mainIni.ghetto.rgrove)
@@ -107,6 +111,8 @@ local rpaint = imgui.ImBool(mainIni.ghetto.rpaint)
 
 local main_window_state = imgui.ImBool(false)
 local sw, sh = getScreenResolution()
+local fa_font = nil
+local fa_glyph_ranges = imgui.ImGlyphRanges({ fa.min_range, fa.max_range })
 
 if not doesFileExist('moonloader/config/MRender.ini') then inicfg.save(mainIni, 'MRender.ini') end
 
@@ -412,55 +418,119 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 	end
 end
 
+function currentver()
+    imgui.Text(u8"Обновление не требуется. У вас актуальная версия. Завершаю поиск.")
+	imgui.SameLine()
+	imgui.Spinner("##spinner", 7, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
+end
+
+function installupdate()
+    imgui.Text(u8"Выполняется установка обновлений... Подождите пару секунд...")
+	imgui.SameLine()
+	imgui.Spinner("##spinner", 7, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
+end
+
+function updatesearch()
+	imgui.Text(u8"Выполняется поиск обновлений... Подождите...")
+	imgui.SameLine()
+	imgui.Spinner("##spinner", 7, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
+end
+
 function imgui.OnDrawFrame()
 	if not main_window_state.v then imgui.Process = false end
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-	imgui.SetNextWindowSize(imgui.ImVec2(610, 435), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.8.4(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
-	imgui.BeginChild('##menu', imgui.ImVec2(150, 405), true)
+	imgui.SetNextWindowSize(imgui.ImVec2(630, 455), imgui.Cond.FirstUseEver)
+	imgui.Begin(u8'MRender v1.8.5(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.BeginChild('##menu', imgui.ImVec2(150, 425), true)
 	imgui.CenterText(u8'Меню')
-	if imgui.Button(u8'Рендер', imgui.ImVec2(135, 72)) then selected = 1 end
+	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 76)) then selected = 1 end
 	imgui.Separator()
-	if imgui.Button(u8'Рендер граффити', imgui.ImVec2(135, 72)) then selected = 2 end
+	if imgui.Button(fa.ICON_FA_SPRAY_CAN .. u8' Рендер граффити', imgui.ImVec2(135, 76)) then selected = 2 end
 	imgui.Separator()
-	if imgui.Button(u8'Информация', imgui.ImVec2(135, 72)) then selected = 3 end
+	if imgui.Button(fa.ICON_FA_INFO_CIRCLE .. u8' Информация', imgui.ImVec2(135, 76)) then selected = 3 end
 	imgui.Separator()
-	if imgui.Button(u8'Кастомизация', imgui.ImVec2(135, 72)) then selected = 4 end
+	if imgui.Button(fa.ICON_FA_USER_COG .. u8' Кастомизация', imgui.ImVec2(135, 76)) then selected = 4 end
 	imgui.Separator()
-	if imgui.Button(u8'Авто-обновление', imgui.ImVec2(135, 45)) then selected = 5 end
+	if imgui.Button(fa.ICON_FA_WRENCH .. u8' Авто-обновление', imgui.ImVec2(135, 48)) then selected = 5 end
 	imgui.EndChild()
 	imgui.SameLine()
 	if selected == 1 then
-		imgui.BeginChild('##render', imgui.ImVec2(440, 405), true)
+		imgui.BeginChild('##render', imgui.ImVec2(460, 425), true)
 		imgui.CenterText(u8'Основное')
 		imgui.Separator()
 		imgui.Checkbox(u8"Лен", rflax)
+		-- [[if clue.v == false then...end -- проверка скрытия подсказок ]]
+		if clue.v == false then
+			imgui.Hint(u8"Активирует рендер на ресурс лен\nПримечание: Рендер срабатывает на грядки льна у домов",0) 
+		end
 		imgui.Checkbox(u8"Хлопок", rcotton)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на ресурс хлопок\nПримечание: Рендер срабатывает на грядки хлопка у домов",0)
+		end
 		imgui.Checkbox(u8"Клады", rtreasure)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на клад [Красный чемодан с замком]\nПримечание: Разработчики недавно добавили систему фейк-клада\nБудьте осторожны!",0)
+	    end
 		imgui.Checkbox(u8"Закладки", rbookmark)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на закладки",0)
+	    end
 		imgui.Checkbox(u8"Семена", rseeds)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на семена наркотиков",0)
+	    end
 		imgui.Checkbox(u8"[NEW!] Олени", rdeer)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на оленей\nПримечание: Возможны баги из за новых кастомных оленей",0)
+	    end
 		imgui.Checkbox(u8"Руда", rore)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на руду\nПримечание: Рендер не показывает название руд",0)
+	    end
 		imgui.Checkbox(u8"Деревья с плодами", rtree)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на деревья",0)
+	    end
 		imgui.Checkbox(u8"Деревья высшего качества", rwood)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на деревья высшего качества",0)
+	    end
 		imgui.Checkbox(u8"Рваная одежда", rclothes)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на рваную одежду",0)
+	    end
 		imgui.Checkbox(u8"Грибы", rmushroom)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на грибы",0)
+	    end
 		imgui.Checkbox(u8"[NEW!] Подарки", rgift)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на подарки, которые спавнятся по карте",0)
+	    end
 		imgui.Separator()
-		imgui.CenterText(u8'Свои объекты')
+		imgui.CenterText(u8'Свои объекты(триггеры)')
 		imgui.Checkbox(u8"Свой объект №1", myObjectOne)
+		if clue.v == false then
+		    imgui.Hint(u8"Данный чекбокс позволяет добавить свой кастомный триггер на надпись\nПримечание: Учитывайте регистр надписи",0)
+	    end
 		imgui.Text(u8'Название для obj №1')
 		imgui.SameLine()
 		imgui.InputText(u8'##Название объекта для рендера №1', nameObjectOne)
+		if clue.v == false then
+		    imgui.Hint(u8"Напишите сюда текст, на который хотите сделать триггер\nПримечание: Если надпись ALT- то так и пишите ALT",0)
+	    end
 		imgui.Checkbox(u8"Свой объект №2", myObjectTwo)
+		if clue.v == false then
+		    imgui.Hint(u8"Данный чекбокс позволяет добавить свой кастомный триггер на надпись\nПримечание: Учитывайте регистр надписи",0)
+	    end
 		imgui.Text(u8'Название для obj №2')
 		imgui.SameLine()
 		imgui.InputText(u8'##Название объекта для рендера №2', nameObjectTwo)
 		saving()
 		imgui.EndChild()
     elseif selected == 2 then
-		imgui.BeginChild('##getto', imgui.ImVec2(440, 405), true)
+		imgui.BeginChild('##getto', imgui.ImVec2(460, 425), true)
 		imgui.CenterText(u8'Рендер граффити')
 		imgui.Separator()
 		imgui.Checkbox(u8"Грув", rgrove)
@@ -468,12 +538,12 @@ function imgui.OnDrawFrame()
 	    imgui.Checkbox(u8"Рифа", rrifa)
 	    imgui.Checkbox(u8"Ацтек", raztec)
 	    imgui.Checkbox(u8"Ночные волки", rNightWolves)
-	    imgui.Checkbox(u8"Вагос", rvagos)
-		imgui.Checkbox(u8"[Временно не работает] Показать только граффити которые можно закрасить", rpaint)
+	    imgui.Checkbox(u8"Вагос", rvagos) 
+		imgui.Checkbox(u8"[NO WORK] Показать только граффити которые можно закрасить", rpaint)
 		saving()
 		imgui.EndChild()
     elseif selected == 3 then
-		imgui.BeginChild('##information', imgui.ImVec2(440, 405), true)
+		imgui.BeginChild('##information', imgui.ImVec2(460, 425), true)
 		imgui.CenterText(u8'Информация')
 		imgui.Separator()
 		imgui.Link(u8'https://www.blast.hk/members/449591/', u8'Профиль автора на BlastHack')
@@ -488,7 +558,7 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 7%')
 		imgui.EndChild()
 	elseif selected == 4 then
-		imgui.BeginChild('##settings', imgui.ImVec2(440, 405), true)
+		imgui.BeginChild('##settings', imgui.ImVec2(460, 425), true)
 		imgui.CenterText(u8'Кастомизация')
         imgui.Separator()
 		if imgui.InputText(u8'##Название скрипта', scriptName) then
@@ -496,7 +566,7 @@ function imgui.OnDrawFrame()
 			inicfg.save(mainIni, "MRender.ini")
 		end
 		imgui.Text(u8'Указывайте команду активации без / (!!!)')
-		imgui.Text(u8'После ввода новой команды,перезагрузите скрипты')
+		imgui.Text(u8'После ввода новой команды - перезагрузите скрипты')
 		imgui.Text(u8'или перезайдите в игру')
 		imgui.Separator()
 		if imgui.Button(u8'Выгрузить скрипт', imgui.ImVec2(120,40)) then
@@ -505,20 +575,54 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'[]-- Чтобы скрипт вернулся в игру, перезагрузите скрипты')
 		imgui.Text(u8'[]-- Или перезайдите в игру')
 		imgui.Separator()
+		if imgui.Checkbox(u8"[NEW!] Скрыть подсказки", clue) then
+			mainIni.settings.clue = clue.v
+			inicfg.save(mainIni, "MRender.ini")
+		end
+		imgui.CenterText(u8'SOON...NEW FUNCTIONS...')
+		--[[function custom on 1.8.6-1.8.7]]
 		imgui.EndChild()
 	elseif selected == 5 then
-		imgui.BeginChild('##update', imgui.ImVec2(440, 405), true)
+		imgui.BeginChild('##update', imgui.ImVec2(460, 425), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
 		if imgui.Button(u8'Загрузить обновление', imgui.ImVec2(140,50)) then
 			local lastver = update():getLastVersion()
             if thisScript().version ~= lastver then
-			sampAddChatMessage('[AUTOUPDATE] {D5DEDD}Доступно обновление! Скачиваю...',0xFF0000)
-            update():download()
+			    lua_thread.create(function()
+			        visualsearch = true -- устанавливает поиск обновлений
+			        wait(4000) --делает временную задержку перед остановкой поиска
+			        visualsearch = false -- прекращение поиск обновления
+					wait(1400) -- задержка перед установкой обновления
+					install = true -- выполняется установка обновления
+					wait(6500) -- задержка перед завершением установки
+					install = false -- завершение установки
+                    update():download() -- обновление
+			    end)
             end
 			if thisScript().version == lastver then
-                sampAddChatMessage('[AUTOUPDATE] {D5DEDD}У вас уже актуальная версия!',0xFF0000)
+				lua_thread.create(function()
+			        visualsearch = true
+			        wait(4000)
+			        visualsearch = false
+					wait(1800)
+					currentupdate = true
+					wait(8000)
+					currentupdate = false
+				end)
 			end
+		end
+		if clue.v == false then
+		    imgui.Hint(u8"При нажатии на эту кнопку скрипт проверяет актуальную версию.\nЕсли у вас не последняя версия, то скрипт установит вам актуальную версия.\nЕсли версия совпадает, то ничего не произойдет.",0)
+	    end
+		if visualsearch then
+			updatesearch()
+		end
+		if install then
+			installupdate()
+		end
+		if currentupdate then
+			currentver()
 		end
 		imgui.EndChild()
 	end
@@ -526,7 +630,8 @@ function imgui.OnDrawFrame()
 	end
 end
 
-function theme()
+function apply_custom_style()
+
 	imgui.SwitchContext()
 	local style = imgui.GetStyle()
 	local colors = style.Colors
@@ -549,50 +654,49 @@ function theme()
 	style.GrabRounding = 5.0
 	style.WindowTitleAlign = ImVec2(0.5, 0.5)
 	style.ButtonTextAlign = ImVec2(0.5, 0.5)
-
-	colors[clr.Text]                    = ImVec4(1.00, 1.00, 1.00, 1.00)
-	colors[clr.TextDisabled]            = ImVec4(0.20, 0.20, 0.20, 1.00)
-	colors[clr.WindowBg]                = ImVec4(0.05, 0.05, 0.05, 1.00)
-	colors[clr.ChildWindowBg]           = ImVec4(0.05, 0.05, 0.05, 1.00)
-	colors[clr.PopupBg]                 = ImVec4(0.05, 0.05, 0.05, 1.00)
-	colors[clr.Border]                  = ImVec4(1.00, 1.00, 1.00, 1.00)
-	colors[clr.BorderShadow]            = ImVec4(0.05, 0.05, 0.05, 1.00)
-	colors[clr.FrameBg]                 = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.FrameBgHovered]          = ImVec4(0.20, 0.20, 0.20, 1.00)
-	colors[clr.FrameBgActive]           = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.TitleBg]                 = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.TitleBgCollapsed]        = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.TitleBgActive]           = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.MenuBarBg]               = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.ScrollbarBg]             = ImVec4(0.05, 0.05, 0.05, 1.00)
-	colors[clr.ScrollbarGrab]           = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.ScrollbarGrabHovered]    = ImVec4(0.20, 0.20, 0.20, 1.00)
-	colors[clr.ScrollbarGrabActive]     = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.ComboBg]                 = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.CheckMark]               = ImVec4(1.00, 1.00, 1.00, 1.00)
-	colors[clr.SliderGrab]              = ImVec4(1.00, 1.00, 1.00, 1.00)
-	colors[clr.SliderGrabActive]        = ImVec4(1.00, 1.00, 1.00, 1.00)
-	colors[clr.Button]                  = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.ButtonHovered]           = ImVec4(0.20, 0.20, 0.20, 1.00)
-	colors[clr.ButtonActive]            = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.Header]                  = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.HeaderHovered]           = ImVec4(0.20, 0.20, 0.20, 1.00)
-	colors[clr.HeaderActive]            = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.ResizeGrip]              = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.ResizeGripHovered]       = ImVec4(0.20, 0.20, 0.20, 1.00)
-	colors[clr.ResizeGripActive]        = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.CloseButton]             = ImVec4(0.05, 0.05, 0.05, 1.00)
-	colors[clr.CloseButtonHovered]      = ImVec4(0.05, 0.05, 0.05, 1.00)
-	colors[clr.CloseButtonActive]       = ImVec4(0.05, 0.05, 0.05, 1.00)
-	colors[clr.PlotLines]               = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.PlotLinesHovered]        = ImVec4(0.20, 0.20, 0.20, 1.00)
-	colors[clr.PlotHistogram]           = ImVec4(0.13, 0.13, 0.13, 1.00)
-	colors[clr.PlotHistogramHovered]    = ImVec4(0.20, 0.20, 0.20, 1.00)
-	colors[clr.TextSelectedBg]          = ImVec4(0.05, 0.05, 0.05, 1.00)
-	colors[clr.ModalWindowDarkening]    = ImVec4(1.00, 1.00, 1.00, 1.00)
+ 
+	colors[clr.Text] = ImVec4(0.95, 0.96, 0.98, 1.00)
+	colors[clr.TextDisabled] = ImVec4(0.36, 0.42, 0.47, 1.00)
+	colors[clr.WindowBg] = ImVec4(0.11, 0.15, 0.17, 1.00)
+	colors[clr.ChildWindowBg] = ImVec4(0.15, 0.18, 0.22, 1.00)
+	colors[clr.PopupBg] = ImVec4(0.08, 0.08, 0.08, 0.94)
+	colors[clr.Border] = ImVec4(0.43, 0.43, 0.50, 0.50)
+	colors[clr.BorderShadow] = ImVec4(0.00, 0.00, 0.00, 0.00)
+	colors[clr.FrameBg] = ImVec4(0.20, 0.25, 0.29, 1.00)
+	colors[clr.FrameBgHovered] = ImVec4(0.12, 0.20, 0.28, 1.00)
+	colors[clr.FrameBgActive] = ImVec4(0.09, 0.12, 0.14, 1.00)
+	colors[clr.TitleBg] = ImVec4(0.09, 0.12, 0.14, 0.65)
+	colors[clr.TitleBgCollapsed] = ImVec4(0.00, 0.00, 0.00, 0.51)
+	colors[clr.TitleBgActive] = ImVec4(0.08, 0.10, 0.12, 1.00)
+	colors[clr.MenuBarBg] = ImVec4(0.15, 0.18, 0.22, 1.00)
+	colors[clr.ScrollbarBg] = ImVec4(0.02, 0.02, 0.02, 0.39)
+	colors[clr.ScrollbarGrab] = ImVec4(0.20, 0.25, 0.29, 1.00)
+	colors[clr.ScrollbarGrabHovered] = ImVec4(0.18, 0.22, 0.25, 1.00)
+	colors[clr.ScrollbarGrabActive] = ImVec4(0.09, 0.21, 0.31, 1.00)
+	colors[clr.ComboBg] = ImVec4(0.20, 0.25, 0.29, 1.00)
+	colors[clr.CheckMark] = ImVec4(0.28, 0.56, 1.00, 1.00)
+	colors[clr.SliderGrab] = ImVec4(0.28, 0.56, 1.00, 1.00)
+	colors[clr.SliderGrabActive] = ImVec4(0.37, 0.61, 1.00, 1.00)
+	colors[clr.Button] = ImVec4(0.20, 0.25, 0.29, 1.00)
+	colors[clr.ButtonHovered] = ImVec4(0.28, 0.56, 1.00, 1.00)
+	colors[clr.ButtonActive] = ImVec4(0.06, 0.53, 0.98, 1.00)
+	colors[clr.Header] = ImVec4(0.20, 0.25, 0.29, 0.55)
+	colors[clr.HeaderHovered] = ImVec4(0.26, 0.59, 0.98, 0.80)
+	colors[clr.HeaderActive] = ImVec4(0.26, 0.59, 0.98, 1.00)
+	colors[clr.ResizeGrip] = ImVec4(0.26, 0.59, 0.98, 0.25)
+	colors[clr.ResizeGripHovered] = ImVec4(0.26, 0.59, 0.98, 0.67)
+	colors[clr.ResizeGripActive] = ImVec4(0.06, 0.05, 0.07, 1.00)
+	colors[clr.CloseButton] = ImVec4(0.40, 0.39, 0.38, 0.16)
+	colors[clr.CloseButtonHovered] = ImVec4(0.40, 0.39, 0.38, 0.39)
+	colors[clr.CloseButtonActive] = ImVec4(0.40, 0.39, 0.38, 1.00)
+	colors[clr.PlotLines] = ImVec4(0.61, 0.61, 0.61, 1.00)
+	colors[clr.PlotLinesHovered] = ImVec4(1.00, 0.43, 0.35, 1.00)
+	colors[clr.PlotHistogram] = ImVec4(0.90, 0.70, 0.00, 1.00)
+	colors[clr.PlotHistogramHovered] = ImVec4(1.00, 0.60, 0.00, 1.00)
+	colors[clr.TextSelectedBg] = ImVec4(0.25, 1.00, 0.00, 0.43)
+	colors[clr.ModalWindowDarkening] = ImVec4(1.00, 0.98, 0.95, 0.73)
 end
-theme()
-
+apply_custom_style()
 
 function saving()
     mainIni.render.rtreasure = rtreasure.v
@@ -650,24 +754,36 @@ function imgui.Link(link,name,myfunc)
     return resultBtn
 end
 
-function imgui.CustomButton(gg, color, colorHovered, colorActive, size)
-    local clr = imgui.Col
-    imgui.PushStyleColor(clr.Button, color)
-    imgui.PushStyleColor(clr.ButtonHovered, colorHovered)
-    imgui.PushStyleColor(clr.ButtonActive, colorActive)
-    if not size then size = imgui.ImVec2(0, 0) end
-    local result = imgui.Button(gg, size)
-    imgui.PopStyleColor(3)
-    return result
+function imgui.BeforeDrawFrame()
+    if fa_font == nil then
+        local font_config = imgui.ImFontConfig() -- to use 'imgui.ImFontConfig.new()' on error
+        font_config.MergeMode = true
+
+        fa_font = imgui.GetIO().Fonts:AddFontFromFileTTF('moonloader/resource/fonts/fa-solid-900.ttf', 13.0, font_config, fa_glyph_ranges)
+    end
 end
 
---[[function graffiti() -- дорабатывается
-	if rpaint.v then
-		rvagos.v = false
-		rgrove.v = false
-        rballas.v = false
-        rrifa.v = false
-        raztec.v = false
-        rNightWolves.v = false
-	end
-end--]]
+
+function imgui.Hint(text, delay, action)
+    if imgui.IsItemHovered() then
+        if go_hint == nil then go_hint = os.clock() + (delay and delay or 0.0) end
+        local alpha = (os.clock() - go_hint) * 5
+        if os.clock() >= go_hint then
+            imgui.PushStyleVar(imgui.StyleVar.WindowPadding, imgui.ImVec2(10, 10))
+            imgui.PushStyleVar(imgui.StyleVar.Alpha, (alpha <= 1.0 and alpha or 1.0))
+                imgui.PushStyleColor(imgui.Col.PopupBg, imgui.ImVec4(0.11, 0.11, 0.11, 1.00))
+                    imgui.BeginTooltip()
+                    imgui.PushTextWrapPos(450)
+                    imgui.TextColored(imgui.GetStyle().Colors[imgui.Col.ButtonHovered], u8'Подсказка:')
+                    imgui.TextUnformatted(text)
+                    if action ~= nil then
+                        imgui.TextColored(imgui.GetStyle().Colors[imgui.Col.TextDisabled], '\n '..action)
+                    end
+                    if not imgui.IsItemVisible() and imgui.GetStyle().Alpha == 1.0 then go_hint = nil end
+                    imgui.PopTextWrapPos()
+                    imgui.EndTooltip()
+                imgui.PopStyleColor()
+            imgui.PopStyleVar(2)
+        end
+    end
+end --[[Функция плавных подсказок by HarlyCloud]]
