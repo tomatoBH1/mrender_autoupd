@@ -1,4 +1,4 @@
-script_version('1.8.5')
+script_version('1.8.6')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -32,6 +32,7 @@ end
 
 require 'lib.moonloader'
 local imgui = require 'imgui'
+local vkey = require'vkeys'
 samp = require 'samp.events'
 local inicfg = require 'inicfg'
 local fa = require 'fAwesome5'
@@ -77,6 +78,8 @@ local mainIni = inicfg.load({
 	settings = {
 	    scriptName = u8'mrender',
 		clue = false,
+		distanceoff = false,
+		selected_item = 0,
 	}
 }, 'MRender')
 
@@ -98,6 +101,8 @@ local nameObjectOne = imgui.ImBuffer(mainIni.render.nameObjectOne, 256)
 local nameObjectTwo = imgui.ImBuffer(mainIni.render.nameObjectTwo, 256)
 local scriptName = imgui.ImBuffer(mainIni.settings.scriptName, 256)
 local clue = imgui.ImBool(mainIni.settings.clue)
+local distanceoff = imgui.ImBool(mainIni.settings.distanceoff)
+local selected_item = imgui.ImInt(mainIni.settings.selected_item)
 
 ------------------------------------------------------
 local rgrove = imgui.ImBool(mainIni.ghetto.rgrove)
@@ -142,7 +147,24 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 	
 	while true do
         wait(0)
-
+		if selected_item.v == 0 then
+			if isKeyJustPressed(vkey.VK_F12) then
+				main_window_state.v = not main_window_state.v
+				imgui.Process = main_window_state.v
+			end
+		end
+		if selected_item.v == 1 then
+			if isKeyJustPressed(vkey.VK_F2) then
+				main_window_state.v = not main_window_state.v
+				imgui.Process = main_window_state.v
+			end
+		end
+		if selected_item.v == 2 then
+			if isKeyJustPressed(vkey.VK_F3) then
+				main_window_state.v = not main_window_state.v
+				imgui.Process = main_window_state.v
+			end
+		end
 		if rdeer.v then
 		    for k,v in ipairs(getAllChars()) do
 			    if select(2, sampGetPlayerIdByCharHandle(v)) == -1 and v ~= PLAYER_PED and getCharModel(v) == 3150 then
@@ -152,7 +174,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 				    local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
 				    distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
 				    if isPointOnScreen(px, py, pz, 0) then
-				        renderFontDrawText(font, ' Олень\n Дистанция: '..distance, wX, wY , colorObj)
+					    if distanceoff.v then
+							renderFontDrawText(font, ' Олень', wX, wY , colorObj)
+						elseif distanceoff.v == false then
+				            renderFontDrawText(font, ' Олень\n Дистанция: '..distance, wX, wY , colorObj)
+						end
 				        renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				    end
 			    end
@@ -168,9 +194,17 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
 					if getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) > 32 then
-					    renderFontDrawText(font, ' Клад(Возможно фейк)\n Дистанция: '..distance, wX, wY , colorObj)
-				    elseif getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) < 32 then
-						renderFontDrawText(font, ' Клад\n Дистанция: '..distance, wX, wY , colorObj)
+						if distanceoff.v then
+					        renderFontDrawText(font, ' Клад(Возможно фейк)', wX, wY , colorObj)
+                        elseif distanceoff.v == false then
+							renderFontDrawText(font, ' Клад(Возможно фейк)\n Дистанция: '..distance, wX, wY , colorObj)
+						end
+					elseif getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) < 32 then
+						if distanceoff.v then
+					        renderFontDrawText(font, ' Клад', wX, wY , colorObj)
+                        elseif distanceoff.v == false then
+							renderFontDrawText(font, ' Клад\n Дистанция: '..distance, wX, wY , colorObj)
+						end
 					end
 					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
@@ -182,7 +216,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
 					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					renderFontDrawText(font, ' Семена\n Дистанция: '..distance, wX, wY , colorObj)
+					if distanceoff.v then
+						renderFontDrawText(font, ' Семена', wX, wY , colorObj)
+					elseif distanceoff.v == false then
+						renderFontDrawText(font, ' Семена\n Дистанция: '..distance, wX, wY , colorObj)
+					end
 					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
@@ -193,7 +231,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
 					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					renderFontDrawText(font, ' Руда\n Дистанция: '..distance, wX, wY , colorObj)
+					if distanceoff.v then
+						renderFontDrawText(font, ' Руда', wX, wY , colorObj)
+					elseif distanceoff.v == false then
+						renderFontDrawText(font, ' Руда\n Дистанция: '..distance, wX, wY , colorObj)
+					end
 					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
@@ -204,7 +246,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
 					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					renderFontDrawText(font, ' Рваная одежда\n Дистанция: '..distance, wX, wY , colorObj)
+					if distanceoff.v then
+						renderFontDrawText(font, ' Рваная одежда', wX, wY , colorObj)
+					elseif distanceoff.v == false then
+						renderFontDrawText(font, ' Рваная одежда\n Дистанция: '..distance, wX, wY , colorObj)
+					end
 					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
@@ -215,7 +261,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
 					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
 					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					renderFontDrawText(font, ' Подарок\n Дистанция: '..distance, wX, wY , colorObj)
+					if distanceoff.v then
+						renderFontDrawText(font, ' Подарок', wX, wY , colorObj)
+					elseif distanceoff.v == false then
+						renderFontDrawText(font, ' Подарок\n Дистанция: '..distance, wX, wY , colorObj)
+					end
 					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
@@ -236,7 +286,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
-                        renderFontDrawText(font,' Закладка\n Дистанция: '..distance, wposX, wposY, colorObj)
+						if distanceoff == false then
+							renderFontDrawText(font,' Закладка\n Дистанция: '..distance, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,' Закладка', wposX, wposY, colorObj)
+						end
                     end
                 end
 				if rflax.v and text:find("Лён") then
@@ -248,10 +302,14 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY, colorObj) 
+                        if distanceoff.v == false then
+							renderFontDrawText(font,texto, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
-				if rcotton.v and text:find("Хлопок") then
+				if rcotton.v and text:find("Хлопок")then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -260,7 +318,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
+                        if distanceoff.v == false then
+							renderFontDrawText(font,texto, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
 				--деревья
@@ -273,7 +335,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,texto, wposX, wposY, colorObj)
+                        if distanceoff.v == false then
+						    renderFontDrawText(font,texto, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
 				if rwood.v and text:find("Дерево высшего качества") then
@@ -285,8 +351,12 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					    renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj)
 					end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,' Дерево выс.качества\n Дистанция: '..distance, wposX, wposY, colorObj)
-                    end
+						if distanceoff.v == false then
+                            renderFontDrawText(font,' Дерево выс.качества\n Дистанция: '..distance, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,' Дерево выс.качества', wposX, wposY, colorObj)
+						end
+					end
                 end
 				--банды
 				if rgrove.v and text:find("Банда: {ff6666}{009327}Grove Street") then
@@ -298,7 +368,11 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+                        if distanceoff.v == false then
+							renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
 				if rballas.v and text:find("Банда: {ff6666}{CC00CC}East Side Ballas") then
@@ -310,10 +384,14 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj)
 					end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+                        if distanceoff.v == false then
+							renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
-			    if rrifa.v and text:find("Банда: {ff6666}{6666FF}The Rifa")  then
+			    if rrifa.v and text:find("Банда: {ff6666}{6666FF}The Rifa") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -321,8 +399,12 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+					if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        if distanceoff.v == false then
+							renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
 				if raztec.v and text:find("Банда: {ff6666}{00FFE2}Varrios Los Aztecas") then
@@ -333,8 +415,12 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+					if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        if distanceoff.v == false then
+							renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
 				if rNightWolves.v and text:find("Банда: {ff6666}{A87878}Night Wolves") then
@@ -345,11 +431,15 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-                        renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+					if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        if distanceoff.v == false then
+							renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
-				if rvagos.v and text:find("Банда: {ff6666}{D1DB1C}Los Santos Vagos") then
+				if rvagos.v and text:find("Банда: {ff6666}{D1DB1C}Los Santos Vagos") and text:find('Повторно закрасить можно через:') then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -357,11 +447,15 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+					if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        if distanceoff.v == false then
+							renderFontDrawText(font,textograffiti, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
-				if rpaint.v and text:find("Можно закрасить!") then
+				if rpaint.v and text:find("Банда: {ff6666}{00FFE2}Varrios Los Aztecas") and not text:find('Повторно закрасить можно через:') or rpaint.v and text:find("Банда: {ff6666}{D1DB1C}Los Santos Vagos") and not text:find('Повторно закрасить можно через:') or rpaint.v and text:find("Банда: {ff6666}{A87878}Night Wolves") and not text:find('Повторно закрасить можно через:') or  rpaint.v and text:find("Банда: {ff6666}{6666FF}The Rifa") and not text:find('Повторно закрасить можно через:') or  rpaint.v and text:find("Банда: {ff6666}{CC00CC}East Side Ballas") and not text:find('Повторно закрасить можно через:') or rpaint.v and text:find("Банда: {ff6666}{009327}Grove Street") and not text:find('Повторно закрасить можно через:') then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -369,8 +463,12 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,texto, wposX, wposY, colorObj)
+					if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        if distanceoff.v == false then
+							renderFontDrawText(font,texto, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
 				if rmushroom.v and text:find("Срезать гриб") then
@@ -382,8 +480,12 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
-                        renderFontDrawText(font,' Гриб\n Дистанция: '..distance, wposX, wposY, colorObj)
-                    end
+						if distanceoff.v == false then
+                            renderFontDrawText(font,' Гриб\n Дистанция: '..distance, wposX, wposY, colorObj)
+                        elseif distanceoff.v then
+							renderFontDrawText(font,' Гриб', wposX, wposY, colorObj)
+						end
+					end
                 end
 				-------------------------------Свои obj-----------------------------------
 				if myObjectOne.v and text:find(u8:decode(nameObjectOne.v)) then 
@@ -394,8 +496,12 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					if isPointOnScreen (posX,posY,posZ,1) then
 						renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
 					end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,texto, wposX, wposY, colorObj)
+					if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                        if distanceoff.v == false then
+							renderFontDrawText(font,texto, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
                 end
 				if myObjectTwo.v and text:find(u8:decode(nameObjectTwo.v)) then 
@@ -407,8 +513,13 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						renderFontDrawText(font,texto, wposX, wposY, colorObj)
+                        if distanceoff.v == false then
+							renderFontDrawText(font,texto, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
                     end
+					--sampAddChatMessage('Координаты льна: X: '..posX..' Y: '..posY..' Z: '..posZ, -1)
                 end
 			end
 		end
@@ -417,6 +528,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
         end
 	end
 end
+
 
 function currentver()
     imgui.Text(u8"Обновление не требуется. У вас актуальная версия. Завершаю поиск.")
@@ -435,13 +547,24 @@ function updatesearch()
 	imgui.SameLine()
 	imgui.Spinner("##spinner", 7, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
 end
+function key_selection()
+	if selected_item.v == 0 then
+	    imgui.Text(u8"Настройки применены.Для активации скрипта вы выбрали клавишу F12")
+	elseif selected_item.v == 1 then
+		imgui.Text(u8"Настройки применены.Для активации скрипта вы выбрали клавишу F2")
+    elseif selected_item.v == 2 then
+		imgui.Text(u8"Настройки применены.Для активации скрипта вы выбрали клавишу F3")
+	end
+	imgui.SameLine()
+	imgui.Spinner("##spinner", 7, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
+end
 
 function imgui.OnDrawFrame()
 	if not main_window_state.v then imgui.Process = false end
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(630, 455), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.8.5(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.8.6(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 425), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 76)) then selected = 1 end
@@ -533,13 +656,44 @@ function imgui.OnDrawFrame()
 		imgui.BeginChild('##getto', imgui.ImVec2(460, 425), true)
 		imgui.CenterText(u8'Рендер граффити')
 		imgui.Separator()
-		imgui.Checkbox(u8"Грув", rgrove)
-	    imgui.Checkbox(u8"Баллас", rballas)
-	    imgui.Checkbox(u8"Рифа", rrifa)
-	    imgui.Checkbox(u8"Ацтек", raztec)
-	    imgui.Checkbox(u8"Ночные волки", rNightWolves)
-	    imgui.Checkbox(u8"Вагос", rvagos) 
-		imgui.Checkbox(u8"[NO WORK] Показать только граффити которые можно закрасить", rpaint)
+		if imgui.Checkbox(u8"Грув", rgrove) then
+			if rpaint.v then
+			    rpaint.v = false
+			end
+		end
+	    if imgui.Checkbox(u8"Баллас", rballas) then
+			if rpaint.v then
+			    rpaint.v = false
+			end
+		end
+	    if imgui.Checkbox(u8"Рифа", rrifa) then
+			if rpaint.v then
+			    rpaint.v = false
+			end
+		end
+	    if imgui.Checkbox(u8"Ацтек", raztec) then
+		    if rpaint.v then
+			    rpaint.v = false
+			end
+		end
+	    if imgui.Checkbox(u8"Ночные волки", rNightWolves) then
+			if rpaint.v then
+			    rpaint.v = false
+			end
+		end
+	    if imgui.Checkbox(u8"Вагос", rvagos) then
+			if rpaint.v then
+			    rpaint.v = false
+			end
+		end
+		if imgui.Checkbox(u8"[NEW!] Показать только те граффити, которые доступны для закраски", rpaint) then
+			rgrove.v = false
+			rballas.v = false
+			raztec.v = false
+			rNightWolves.v = false
+			rvagos.v = false
+			rrifa.v = false--[[Система блокировки лишних граффити]]
+		end
 		saving()
 		imgui.EndChild()
     elseif selected == 3 then
@@ -548,37 +702,74 @@ function imgui.OnDrawFrame()
 		imgui.Separator()
 		imgui.Link(u8'https://www.blast.hk/members/449591/', u8'Профиль автора на BlastHack')
 		imgui.Link('https://t.me/rendersamp', u8'Telegram-канал скрипта')
+		imgui.Link('https://t.me/tomatoBH', u8'Telegram автора скрипта')
 		imgui.Text(u8'Запустить скрипт: /'..scriptName.v)
 		imgui.Text(u8'--[] Если скрипт начал неправильно работать - сбросите конфиг')
 		imgui.Text(u8'--[] Для сброса конфига - используйте команду: /removeconfig')
+		imgui.Text(u8'--[] или кнопку в разделе Кастомизация')
 		imgui.Separator()
         imgui.Text(u8'ВНИМАНИЕ!!!')
-		imgui.Text(u8'При использовании возможны потери fps до 18%')
+		imgui.Text(u8'При использовании возможны потери FPS до 20%.')
 		imgui.Text(u8'Это связано с обновлением кастомизации')
-		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 7%')
+		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 6%')
+		imgui.Text(u8'-- При нестабильности работы скрипта обратитесь к автору')
 		imgui.EndChild()
 	elseif selected == 4 then
 		imgui.BeginChild('##settings', imgui.ImVec2(460, 425), true)
 		imgui.CenterText(u8'Кастомизация')
         imgui.Separator()
+		imgui.PushItemWidth(150)
 		if imgui.InputText(u8'##Название скрипта', scriptName) then
 			mainIni.settings.scriptName = scriptName.v
 			inicfg.save(mainIni, "MRender.ini")
 		end
+		imgui.PopItemWidth()
+		imgui.SameLine()
+		imgui.Text(u8'Команда активации скрипта')
 		imgui.Text(u8'Указывайте команду активации без / (!!!)')
 		imgui.Text(u8'После ввода новой команды - перезагрузите скрипты')
 		imgui.Text(u8'или перезайдите в игру')
 		imgui.Separator()
-		if imgui.Button(u8'Выгрузить скрипт', imgui.ImVec2(120,40)) then
+		if imgui.Button(u8'Выгрузить скрипт', imgui.ImVec2(115,36)) then
 			thisScript():unload()
 		end
-		imgui.Text(u8'[]-- Чтобы скрипт вернулся в игру, перезагрузите скрипты')
-		imgui.Text(u8'[]-- Или перезайдите в игру')
+		if clue.v == false then
+		    imgui.Hint(u8"Данная кнопка выгружает скрипт из игры, вы не сможете им пользоваться.\nПримечание: Чтобы скрипт вернулся, перезагрузите скрипты или перезайдите в игру.",0)
+	    end
+		imgui.SameLine()
+		if imgui.Button(u8'Сбросить конфиг', imgui.ImVec2(115,36)) then
+			os.remove('moonloader\\config\\MRender.ini')
+		    thisScript():reload()
+		    sampAddChatMessage('[MRender] {D5DEDD}Конфиг скрипта сброшен!', 0xFF0000)
+		end
+		if clue.v == false then
+		    imgui.Hint(u8"Данная кнопка очищает все ваши настройки(ini file)\nПримечание: При нажатии на данную кнопку вы потеряете все свои настройки!",0)
+	    end
 		imgui.Separator()
 		if imgui.Checkbox(u8"[NEW!] Скрыть подсказки", clue) then
 			mainIni.settings.clue = clue.v
 			inicfg.save(mainIni, "MRender.ini")
 		end
+		if imgui.Checkbox(u8"[NEW!] Скрыть отображение дистанции", distanceoff) then
+			mainIni.settings.distanceoff = distanceoff.v
+			inicfg.save(mainIni, "MRender.ini")
+		end
+		imgui.PushItemWidth(120)
+		if imgui.Combo(u8'[NEW!] Активация скрипта(клавиша)', selected_item, {'F12', 'F2', 'F3'}, 4) then
+			if selected_item.v == 0 or selected_item.v == 1 or selected_item.v == 2 then
+				lua_thread.create(function()
+					key = true
+					wait(6000)
+					key = false
+			    end)
+			end
+			mainIni.settings.selected_item = selected_item.v
+			inicfg.save(mainIni, "MRender.ini")
+		end
+		if key then
+			key_selection()
+		end
+        imgui.PopItemWidth()
 		imgui.CenterText(u8'SOON...NEW FUNCTIONS...')
 		--[[function custom on 1.8.6-1.8.7]]
 		imgui.EndChild()
@@ -625,9 +816,9 @@ function imgui.OnDrawFrame()
 			currentver()
 		end
 		imgui.EndChild()
-	end
+    end
 	imgui.End()
-	end
+    end
 end
 
 function apply_custom_style()
@@ -722,6 +913,7 @@ function saving()
 	mainIni.render.myObjectTwo =  myObjectTwo.v
 	mainIni.render.nameObjectOne = nameObjectOne.v
 	mainIni.render.nameObjectTwo = nameObjectTwo.v
+	mainIni.settings.selected_item = selected_item.v
     inicfg.save(mainIni, "MRender.ini")
 end
 
