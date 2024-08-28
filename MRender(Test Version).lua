@@ -1,4 +1,4 @@
-script_version('1.8.6')
+script_version('1.8.7')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -36,6 +36,7 @@ local vkey = require'vkeys'
 samp = require 'samp.events'
 local inicfg = require 'inicfg'
 local fa = require 'fAwesome5'
+local ffi = require("ffi")
 local font = renderCreateFont("Tahoma", 9, 5) --[[Шрифт]]
 local encoding = require 'encoding'
 encoding.default = 'CP1251'
@@ -63,6 +64,8 @@ local mainIni = inicfg.load({
 		rclothes = false,
 		rmushroom = false,
 		rgift = false,
+		rbox = false,
+		rore_underground = false,
 	    nameObjectOne = u8'Object name',
 		nameObjectTwo = u8'Object name'
     },
@@ -90,6 +93,7 @@ local rflax = imgui.ImBool(mainIni.render.rflax)
 local rcotton = imgui.ImBool(mainIni.render.rcotton)
 local rseeds = imgui.ImBool(mainIni.render.rseeds)
 local rore = imgui.ImBool(mainIni.render.rore)
+local rore_underground = imgui.ImBool(mainIni.render.rore_underground)
 local rtree = imgui.ImBool(mainIni.render.rtree)
 local rwood = imgui.ImBool(mainIni.render.rwood)
 local myObjectOne = imgui.ImBool(mainIni.render.myObjectOne)
@@ -103,6 +107,7 @@ local scriptName = imgui.ImBuffer(mainIni.settings.scriptName, 256)
 local clue = imgui.ImBool(mainIni.settings.clue)
 local distanceoff = imgui.ImBool(mainIni.settings.distanceoff)
 local selected_item = imgui.ImInt(mainIni.settings.selected_item)
+local rbox = imgui.ImBool(mainIni.render.rbox)
 
 ------------------------------------------------------
 local rgrove = imgui.ImBool(mainIni.ghetto.rgrove)
@@ -184,31 +189,32 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 			    end
 		    end
 	    end
-		for k, v in pairs(getAllObjects()) do
-			local num = getObjectModel(v)
-			if isObjectOnScreen(v) and rtreasure.v then
-				if num == 2680 then
-					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
-					local res, px, py, pz = getObjectCoordinates(v)
-					local wX, wY = convert3DCoordsToScreen(px, py, pz)
-					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					if getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) > 32 then
-						if distanceoff.v then
-					        renderFontDrawText(font, ' Клад(Возможно фейк)', wX, wY , colorObj)
-                        elseif distanceoff.v == false then
-							renderFontDrawText(font, ' Клад(Возможно фейк)\n Дистанция: '..distance, wX, wY , colorObj)
-						end
-					elseif getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) < 32 then
-						if distanceoff.v then
-					        renderFontDrawText(font, ' Клад', wX, wY , colorObj)
-                        elseif distanceoff.v == false then
-							renderFontDrawText(font, ' Клад\n Дистанция: '..distance, wX, wY , colorObj)
-						end
-					end
-					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
-				end
-			end
+		if rtreasure.v or rseeds.v or rore.v or rclothes.v or rgift.v then -- new test functions optimization
+		    for k, v in pairs(getAllObjects()) do
+			    local num = getObjectModel(v)
+			    if isObjectOnScreen(v) and rtreasure.v then
+				    if num == 2680 then
+					    local xp,yp,zp = getCharCoordinates(PLAYER_PED)
+					    local res, px, py, pz = getObjectCoordinates(v)
+					    local wX, wY = convert3DCoordsToScreen(px, py, pz)
+					    distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
+					    local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
+					    if getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) > 32 then
+						    if distanceoff.v then
+					            renderFontDrawText(font, ' Клад(Возможно фейк)', wX, wY , colorObj)
+                            elseif distanceoff.v == false then
+							    renderFontDrawText(font, ' Клад(Возможно фейк)\n Дистанция: '..distance, wX, wY , colorObj)
+						    end
+					    elseif getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) < 32 then
+						    if distanceoff.v then
+					            renderFontDrawText(font, ' Клад', wX, wY , colorObj)
+                            elseif distanceoff.v == false then
+							    renderFontDrawText(font, ' Клад\n Дистанция: '..distance, wX, wY , colorObj)
+						    end
+					    end
+					    renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
+				    end
+			    end
 			if isObjectOnScreen(v) and rseeds.v then
 				if num == 859 then
 					local res, px, py, pz = getObjectCoordinates(v)
@@ -269,7 +275,8 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
-		end
+		    end
+	    end
 		for id = 0, 2048 do
             local result = sampIs3dTextDefined( id )
             if result then
@@ -355,6 +362,38 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                             renderFontDrawText(font,' Дерево выс.качества\n Дистанция: '..distance, wposX, wposY, colorObj)
 						elseif distanceoff.v then
 							renderFontDrawText(font,' Дерево выс.качества', wposX, wposY, colorObj)
+						end
+					end
+                end
+				if rore_underground.v and text:find("Место добычи ресурсов") then
+					local resX, resY = getScreenResolution()
+					local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
+                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
+					    renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj)
+					end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+						if distanceoff.v == false then
+                            renderFontDrawText(font,' Руда(Подземная)\n Дистанция: '..distance, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,' Руда(Подземная)', wposX, wposY, colorObj)
+						end
+					end
+                end
+				if rbox.v and text:find("Открыть сундук") then
+					local resX, resY = getScreenResolution()
+					local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
+                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
+					    renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj)
+					end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+						if distanceoff.v == false then
+                            renderFontDrawText(font,' Сундук BomjGang\n Дистанция: '..distance, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,' Сундук BomjGang', wposX, wposY, colorObj)
 						end
 					end
                 end
@@ -564,7 +603,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(630, 455), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.8.6(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.8.7(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 425), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 76)) then selected = 1 end
@@ -627,9 +666,17 @@ function imgui.OnDrawFrame()
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на грибы",0)
 	    end
-		imgui.Checkbox(u8"[NEW!] Подарки", rgift)
+		imgui.Checkbox(u8"Подарки(По карте)", rgift)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на подарки, которые спавнятся по карте",0)
+	    end
+		imgui.Checkbox(u8"[NEW!] Cyндуки BOMJGANG", rbox)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на сундуки, которые падают с бомжей\n/gps - Праздничное обновление - Зона вторжения",0)
+	    end
+		imgui.Checkbox(u8"[NEW!] Руда(Подземная шахта)", rore_underground)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на руду, которая находится в подземной шахте",0)
 	    end
 		imgui.Separator()
 		imgui.CenterText(u8'Свои объекты(триггеры)')
@@ -898,6 +945,7 @@ function saving()
 	mainIni.render.rcotton = rcotton.v
 	mainIni.render.rseeds = rseeds.v
 	mainIni.render.rore = rore.v
+	mainIni.render.rore_underground = rore_underground.v
     mainIni.render.rtree = rtree.v
 	mainIni.render.rclothes = rclothes.v
 	mainIni.render.rmushroom = rmushroom.v
@@ -909,6 +957,7 @@ function saving()
 	mainIni.ghetto.rvagos =  rvagos.v
 	mainIni.ghetto.rpaint =  rpaint.v
 	mainIni.render.rwood =  rwood.v
+	mainIni.render.rbox =  rbox.v
 	mainIni.render.myObjectOne =  myObjectOne.v
 	mainIni.render.myObjectTwo =  myObjectTwo.v
 	mainIni.render.nameObjectOne = nameObjectOne.v
@@ -954,7 +1003,6 @@ function imgui.BeforeDrawFrame()
         fa_font = imgui.GetIO().Fonts:AddFontFromFileTTF('moonloader/resource/fonts/fa-solid-900.ttf', 13.0, font_config, fa_glyph_ranges)
     end
 end
-
 
 function imgui.Hint(text, delay, action)
     if imgui.IsItemHovered() then
