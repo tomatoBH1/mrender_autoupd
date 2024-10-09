@@ -1,4 +1,4 @@
-script_version('1.8.7')
+script_version('1.8.8')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -48,6 +48,10 @@ local colorObj = '0xFFFFFFFF' --[[Укажите формат цвета , например 0xFFFFFFFF - б
 local linewidth = '3.5' --[[Рекомендованные значения от 3.0 до 5.0]]
 --[[settings colors and lines]]
 
+--[[rgb lenta]]
+local speed = 2
+local rb_line_size = 100
+
 local mainIni = inicfg.load({
 	render = {
 	    rtreasure = false,
@@ -64,7 +68,7 @@ local mainIni = inicfg.load({
 		rclothes = false,
 		rmushroom = false,
 		rgift = false,
-		rbox = false,
+		rrgb = true,
 		rore_underground = false,
 	    nameObjectOne = u8'Object name',
 		nameObjectTwo = u8'Object name'
@@ -107,7 +111,7 @@ local scriptName = imgui.ImBuffer(mainIni.settings.scriptName, 256)
 local clue = imgui.ImBool(mainIni.settings.clue)
 local distanceoff = imgui.ImBool(mainIni.settings.distanceoff)
 local selected_item = imgui.ImInt(mainIni.settings.selected_item)
-local rbox = imgui.ImBool(mainIni.render.rbox)
+local rrgb = imgui.ImBool(mainIni.render.rrgb)
 
 ------------------------------------------------------
 local rgrove = imgui.ImBool(mainIni.ghetto.rgrove)
@@ -381,22 +385,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
 					end
                 end
-				if rbox.v and text:find("Открыть сундук") then
-					local resX, resY = getScreenResolution()
-					local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-					if isPointOnScreen (posX,posY,posZ,1) then
-					    renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj)
-					end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						if distanceoff.v == false then
-                            renderFontDrawText(font,' Сундук BomjGang\n Дистанция: '..distance, wposX, wposY, colorObj)
-						elseif distanceoff.v then
-							renderFontDrawText(font,' Сундук BomjGang', wposX, wposY, colorObj)
-						end
-					end
-                end
 				--банды
 				if rgrove.v and text:find("Банда: {ff6666}{009327}Grove Street") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
@@ -602,9 +590,12 @@ function imgui.OnDrawFrame()
 	if not main_window_state.v then imgui.Process = false end
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-	imgui.SetNextWindowSize(imgui.ImVec2(630, 455), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.8.7(Тестовая версия, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
-	imgui.BeginChild('##menu', imgui.ImVec2(150, 425), true)
+	imgui.SetNextWindowSize(imgui.ImVec2(630, 470), imgui.Cond.FirstUseEver)
+	imgui.Begin(u8'MRender v1.8.8(Промежуточное обновление, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	if rrgb.v then
+	    rainbow_line(610, 6)
+	end
+	imgui.BeginChild('##menu', imgui.ImVec2(150, 430), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 76)) then selected = 1 end
 	imgui.Separator()
@@ -614,15 +605,14 @@ function imgui.OnDrawFrame()
 	imgui.Separator()
 	if imgui.Button(fa.ICON_FA_USER_COG .. u8' Кастомизация', imgui.ImVec2(135, 76)) then selected = 4 end
 	imgui.Separator()
-	if imgui.Button(fa.ICON_FA_WRENCH .. u8' Авто-обновление', imgui.ImVec2(135, 48)) then selected = 5 end
+	if imgui.Button(fa.ICON_FA_WRENCH .. u8' Авто-обновление', imgui.ImVec2(135, 52)) then selected = 5 end
 	imgui.EndChild()
 	imgui.SameLine()
 	if selected == 1 then
-		imgui.BeginChild('##render', imgui.ImVec2(460, 425), true)
+		imgui.BeginChild('##render', imgui.ImVec2(460, 430), true)
 		imgui.CenterText(u8'Основное')
 		imgui.Separator()
 		imgui.Checkbox(u8"Лен", rflax)
-		-- [[if clue.v == false then...end -- проверка скрытия подсказок ]]
 		if clue.v == false then
 			imgui.Hint(u8"Активирует рендер на ресурс лен\nПримечание: Рендер срабатывает на грядки льна у домов",0) 
 		end
@@ -670,10 +660,6 @@ function imgui.OnDrawFrame()
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на подарки, которые спавнятся по карте",0)
 	    end
-		imgui.Checkbox(u8"[NEW!] Cyндуки BOMJGANG", rbox)
-		if clue.v == false then
-		    imgui.Hint(u8"Активирует рендер на сундуки, которые падают с бомжей\n/gps - Праздничное обновление - Зона вторжения",0)
-	    end
 		imgui.Checkbox(u8"[NEW!] Руда(Подземная шахта)", rore_underground)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на руду, которая находится в подземной шахте",0)
@@ -700,7 +686,7 @@ function imgui.OnDrawFrame()
 		saving()
 		imgui.EndChild()
     elseif selected == 2 then
-		imgui.BeginChild('##getto', imgui.ImVec2(460, 425), true)
+		imgui.BeginChild('##getto', imgui.ImVec2(460, 430), true)
 		imgui.CenterText(u8'Рендер граффити')
 		imgui.Separator()
 		if imgui.Checkbox(u8"Грув", rgrove) then
@@ -744,7 +730,7 @@ function imgui.OnDrawFrame()
 		saving()
 		imgui.EndChild()
     elseif selected == 3 then
-		imgui.BeginChild('##information', imgui.ImVec2(460, 425), true)
+		imgui.BeginChild('##information', imgui.ImVec2(460, 430), true)
 		imgui.CenterText(u8'Информация')
 		imgui.Separator()
 		imgui.Link(u8'https://www.blast.hk/members/449591/', u8'Профиль автора на BlastHack')
@@ -762,7 +748,7 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'-- При нестабильности работы скрипта обратитесь к автору')
 		imgui.EndChild()
 	elseif selected == 4 then
-		imgui.BeginChild('##settings', imgui.ImVec2(460, 425), true)
+		imgui.BeginChild('##settings', imgui.ImVec2(460, 430), true)
 		imgui.CenterText(u8'Кастомизация')
         imgui.Separator()
 		imgui.PushItemWidth(150)
@@ -797,6 +783,10 @@ function imgui.OnDrawFrame()
 			mainIni.settings.clue = clue.v
 			inicfg.save(mainIni, "MRender.ini")
 		end
+		if imgui.Checkbox(u8"[NEW!] Отображать RGB-ленту", rrgb) then
+			mainIni.settings.rrgb = rrgb.v
+			inicfg.save(mainIni, "MRender.ini")
+		end
 		if imgui.Checkbox(u8"[NEW!] Скрыть отображение дистанции", distanceoff) then
 			mainIni.settings.distanceoff = distanceoff.v
 			inicfg.save(mainIni, "MRender.ini")
@@ -821,7 +811,7 @@ function imgui.OnDrawFrame()
 		--[[function custom on 1.8.6-1.8.7]]
 		imgui.EndChild()
 	elseif selected == 5 then
-		imgui.BeginChild('##update', imgui.ImVec2(460, 425), true)
+		imgui.BeginChild('##update', imgui.ImVec2(460, 430), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
 		if imgui.Button(u8'Загрузить обновление', imgui.ImVec2(140,50)) then
@@ -957,7 +947,6 @@ function saving()
 	mainIni.ghetto.rvagos =  rvagos.v
 	mainIni.ghetto.rpaint =  rpaint.v
 	mainIni.render.rwood =  rwood.v
-	mainIni.render.rbox =  rbox.v
 	mainIni.render.myObjectOne =  myObjectOne.v
 	mainIni.render.myObjectTwo =  myObjectTwo.v
 	mainIni.render.nameObjectOne = nameObjectOne.v
@@ -1027,3 +1016,29 @@ function imgui.Hint(text, delay, action)
         end
     end
 end --[[Функция плавных подсказок by HarlyCloud]]
+
+function join_argb(a, r, g, b) -- by FYP
+    local argb = b  -- b
+    argb = bit.bor(argb, bit.lshift(g, 8))  -- g
+    argb = bit.bor(argb, bit.lshift(r, 16)) -- r
+    argb = bit.bor(argb, bit.lshift(a, 24)) -- a
+    return argb
+end
+
+function rainbow(speed, alpha, offset) -- by rraggerr
+    local clock = os.clock() + offset
+    local r = math.floor(math.sin(clock * speed) * 127 + 128)
+    local g = math.floor(math.sin(clock * speed + 2) * 127 + 128)
+    local b = math.floor(math.sin(clock * speed + 4) * 127 + 128)
+    return r,g,b,alpha
+end
+
+function rainbow_line(distance, size) -- by Fomikus
+    local op = imgui.GetCursorPos()
+    local p = imgui.GetCursorScreenPos()
+    for i = 0, distance do
+    r, g, b, a = rainbow(speed, 255, i / rb_line_size)
+    imgui.GetWindowDrawList():AddRectFilled(imgui.ImVec2(p.x + i, p.y), imgui.ImVec2(p.x + i + 1, p.y + size), join_argb(a, r, g, b))
+    end
+    imgui.SetCursorPos(imgui.ImVec2(op.x, op.y + size + imgui.GetStyle().ItemSpacing.y))
+end
