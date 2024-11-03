@@ -1,4 +1,4 @@
-script_version('1.8.8')
+script_version('1.8.9')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -48,10 +48,6 @@ local colorObj = '0xFFFFFFFF' --[[Укажите формат цвета , например 0xFFFFFFFF - б
 local linewidth = '3.5' --[[Рекомендованные значения от 3.0 до 5.0]]
 --[[settings colors and lines]]
 
---[[rgb lenta]]
-local speed = 2
-local rb_line_size = 100
-
 local mainIni = inicfg.load({
 	render = {
 	    rtreasure = false,
@@ -68,8 +64,8 @@ local mainIni = inicfg.load({
 		rclothes = false,
 		rmushroom = false,
 		rgift = false,
-		rrgb = true,
 		rore_underground = false,
+		rchest_haid = false,
 	    nameObjectOne = u8'Object name',
 		nameObjectTwo = u8'Object name'
     },
@@ -111,7 +107,7 @@ local scriptName = imgui.ImBuffer(mainIni.settings.scriptName, 256)
 local clue = imgui.ImBool(mainIni.settings.clue)
 local distanceoff = imgui.ImBool(mainIni.settings.distanceoff)
 local selected_item = imgui.ImInt(mainIni.settings.selected_item)
-local rrgb = imgui.ImBool(mainIni.render.rrgb)
+local rchest_haid = imgui.ImBool(mainIni.render.rchest_haid)
 
 ------------------------------------------------------
 local rgrove = imgui.ImBool(mainIni.ghetto.rgrove)
@@ -126,6 +122,7 @@ local rpaint = imgui.ImBool(mainIni.ghetto.rpaint)
 local main_window_state = imgui.ImBool(false)
 local sw, sh = getScreenResolution()
 local fa_font = nil
+event_one = true
 local fa_glyph_ranges = imgui.ImGlyphRanges({ fa.min_range, fa.max_range })
 
 if not doesFileExist('moonloader/config/MRender.ini') then inicfg.save(mainIni, 'MRender.ini') end
@@ -514,6 +511,22 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
 					end
                 end
+				if rchest_haid.v and text:find("Сундук Хайда") then
+                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
+                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+                    local resX, resY = getScreenResolution()
+					if isPointOnScreen (posX,posY,posZ,1) then
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
+						if distanceoff.v == false then
+                            renderFontDrawText(font,' Сундук Хайда\n Дистанция: '..distance, wposX, wposY, colorObj)
+                        elseif distanceoff.v then
+							renderFontDrawText(font,' Сундук Хайда', wposX, wposY, colorObj)
+						end
+					end
+                end
 				-------------------------------Свои obj-----------------------------------
 				if myObjectOne.v and text:find(u8:decode(nameObjectOne.v)) then 
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
@@ -591,10 +604,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(630, 470), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.8.8(Промежуточное обновление, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
-	if rrgb.v then
-	    rainbow_line(610, 6)
-	end
+	imgui.Begin(u8'MRender v1.8.9(Обновление Halloween, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 430), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 76)) then selected = 1 end
@@ -663,6 +673,10 @@ function imgui.OnDrawFrame()
 		imgui.Checkbox(u8"[NEW!] Руда(Подземная шахта)", rore_underground)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на руду, которая находится в подземной шахте",0)
+	    end
+		imgui.Checkbox(u8"[NEW!] Сундук Хайда - Event Halloween 2024", rchest_haid)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на сундуки Хайда, которые находятся  в темном лесу",0)
 	    end
 		imgui.Separator()
 		imgui.CenterText(u8'Свои объекты(триггеры)')
@@ -742,7 +756,7 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'--[] или кнопку в разделе Кастомизация')
 		imgui.Separator()
         imgui.Text(u8'ВНИМАНИЕ!!!')
-		imgui.Text(u8'При использовании возможны потери FPS до 20%.')
+		imgui.Text(u8'При использовании возможны потери FPS до 15%.')
 		imgui.Text(u8'Это связано с обновлением кастомизации')
 		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 6%')
 		imgui.Text(u8'-- При нестабильности работы скрипта обратитесь к автору')
@@ -783,10 +797,44 @@ function imgui.OnDrawFrame()
 			mainIni.settings.clue = clue.v
 			inicfg.save(mainIni, "MRender.ini")
 		end
-		if imgui.Checkbox(u8"[NEW!] Отображать RGB-ленту", rrgb) then
-			mainIni.settings.rrgb = rrgb.v
-			inicfg.save(mainIni, "MRender.ini")
+		--[[система эвента]]
+		if rchest_haid.v and distanceoff.v and event_one == true then
+			if imgui.Button(u8'Не нажимай на меня!', imgui.ImVec2(150,20)) then
+				sampAddChatMessage('{FF0000}[HALLOWEEN 2024) Я же говорил не нажимай!!!', -1)
+				event_one = false
+				event_two = true
+			end
 		end
+		if event_two == true then
+			if imgui.Button(u8'Я же говорю!', imgui.ImVec2(150,20)) then
+				sampAddChatMessage('{FF0000}[HALLOWEEN 2024) Остановись!!!', -1)
+				event_two = false
+				event_three = true
+			end
+		end
+		if event_three == true then
+			if imgui.Button(u8'Нажатие этой кнопки удалит скрипт!', imgui.ImVec2(250,20)) then
+				sampAddChatMessage('{FF0000}[HALLOWEEN 2024) Удаление!!!', -1)
+				event_three = false
+				event_four = true
+			end
+		end
+		if event_four == true then
+			lua_thread.create(function()
+			main_window_state.v = false
+			wait(500)
+			sampAddChatMessage('{FF0000}[HALLOWEEN 2024) config.ini очищен...', -1)
+			wait(1200)
+			sampAddChatMessage('{FF0000}[HALLOWEEN 2024) папка moonloader удалена...', -1)
+			wait(2000)
+			sampAddChatMessage('{FF0000}[HALLOWEEN 2024) папка System32 удалена, перезагрузка системы...', -1)
+			wait(2200)
+			event_four = false
+			sampAddChatMessage('{FF0000}[HALLOWEEN 2024) это всего лишь шутка. :) Спасибо за использование скрипта!', -1)
+			end)
+		end
+		--[[]]
+
 		if imgui.Checkbox(u8"[NEW!] Скрыть отображение дистанции", distanceoff) then
 			mainIni.settings.distanceoff = distanceoff.v
 			inicfg.save(mainIni, "MRender.ini")
@@ -952,6 +1000,7 @@ function saving()
 	mainIni.render.nameObjectOne = nameObjectOne.v
 	mainIni.render.nameObjectTwo = nameObjectTwo.v
 	mainIni.settings.selected_item = selected_item.v
+	mainIni.render.rchest_haid = rchest_haid.v
     inicfg.save(mainIni, "MRender.ini")
 end
 
@@ -1016,29 +1065,3 @@ function imgui.Hint(text, delay, action)
         end
     end
 end --[[Функция плавных подсказок by HarlyCloud]]
-
-function join_argb(a, r, g, b) -- by FYP
-    local argb = b  -- b
-    argb = bit.bor(argb, bit.lshift(g, 8))  -- g
-    argb = bit.bor(argb, bit.lshift(r, 16)) -- r
-    argb = bit.bor(argb, bit.lshift(a, 24)) -- a
-    return argb
-end
-
-function rainbow(speed, alpha, offset) -- by rraggerr
-    local clock = os.clock() + offset
-    local r = math.floor(math.sin(clock * speed) * 127 + 128)
-    local g = math.floor(math.sin(clock * speed + 2) * 127 + 128)
-    local b = math.floor(math.sin(clock * speed + 4) * 127 + 128)
-    return r,g,b,alpha
-end
-
-function rainbow_line(distance, size) -- by Fomikus
-    local op = imgui.GetCursorPos()
-    local p = imgui.GetCursorScreenPos()
-    for i = 0, distance do
-    r, g, b, a = rainbow(speed, 255, i / rb_line_size)
-    imgui.GetWindowDrawList():AddRectFilled(imgui.ImVec2(p.x + i, p.y), imgui.ImVec2(p.x + i + 1, p.y + size), join_argb(a, r, g, b))
-    end
-    imgui.SetCursorPos(imgui.ImVec2(op.x, op.y + size + imgui.GetStyle().ItemSpacing.y))
-end
