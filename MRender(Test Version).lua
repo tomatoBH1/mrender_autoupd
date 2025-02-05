@@ -1,4 +1,4 @@
-script_version('1.8.9')
+script_version('1.9.0')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -43,10 +43,11 @@ encoding.default = 'CP1251'
 u8 = encoding.UTF8
 local selected = 1
 imgui.Spinner = require('imgui_addons').Spinner
---[[settings colors and lines]]
-local colorObj = '0xFFFFFFFF' --[[Укажите формат цвета , например 0xFFFFFFFF - белый цвет]]
-local linewidth = '3.5' --[[Рекомендованные значения от 3.0 до 5.0]]
---[[settings colors and lines]]
+local colors = {u8"Красный", u8"Оранжевый", u8"Желтый", u8"Белый(Standart)",u8"Аква"}
+local width = {u8"1.0", u8"2.0", u8"3.0(Standart)", u8"4.0", u8"5.0"}
+--local colorObj = '0xFFFFFFFF' --[[Укажите формат цвета , например 0xFFFFFFFF - белый цвет]]
+--local linewidth = '3.5' --[[Рекомендованные значения от 3.0 до 5.0]]
+local razdel = nil
 
 local mainIni = inicfg.load({
 	render = {
@@ -61,13 +62,18 @@ local mainIni = inicfg.load({
 		rwood = false,
 		myObjectOne = false,
 		myObjectTwo = false,
+		myObjectThree = false,
+		myObjectFour = false,
+		myObjectFive = false,
 		rclothes = false,
 		rmushroom = false,
 		rgift = false,
 		rore_underground = false,
-		rchest_haid = false,
 	    nameObjectOne = u8'Object name',
-		nameObjectTwo = u8'Object name'
+		nameObjectTwo = u8'Object name',
+		nameObjectThree = u8'Object name',
+		nameObjectFour = u8"Object name",
+		nameObjectFive = u8"Object name",
     },
     ghetto = {
 	    rgrove = false,
@@ -82,7 +88,10 @@ local mainIni = inicfg.load({
 	    scriptName = u8'mrender',
 		clue = false,
 		distanceoff = false,
+		create_object_text = 0,
 		selected_item = 0,
+		combo = 3,
+	    combo1 = 2,
 	}
 }, 'MRender')
 
@@ -98,16 +107,24 @@ local rtree = imgui.ImBool(mainIni.render.rtree)
 local rwood = imgui.ImBool(mainIni.render.rwood)
 local myObjectOne = imgui.ImBool(mainIni.render.myObjectOne)
 local myObjectTwo = imgui.ImBool(mainIni.render.myObjectTwo)
+local myObjectThree = imgui.ImBool(mainIni.render.myObjectThree)
+local myObjectFour = imgui.ImBool(mainIni.render.myObjectFour)
+local myObjectFive = imgui.ImBool(mainIni.render.myObjectFive)
 local rclothes = imgui.ImBool(mainIni.render.rclothes)
 local rmushroom = imgui.ImBool(mainIni.render.rmushroom)
 local rgift= imgui.ImBool(mainIni.render.rgift)
 local nameObjectOne = imgui.ImBuffer(mainIni.render.nameObjectOne, 256)
 local nameObjectTwo = imgui.ImBuffer(mainIni.render.nameObjectTwo, 256)
+local nameObjectThree = imgui.ImBuffer(mainIni.render.nameObjectThree, 256)
+local nameObjectFour = imgui.ImBuffer(mainIni.render.nameObjectFour, 256)
+local nameObjectFive = imgui.ImBuffer(mainIni.render.nameObjectFive, 256)
 local scriptName = imgui.ImBuffer(mainIni.settings.scriptName, 256)
 local clue = imgui.ImBool(mainIni.settings.clue)
 local distanceoff = imgui.ImBool(mainIni.settings.distanceoff)
 local selected_item = imgui.ImInt(mainIni.settings.selected_item)
-local rchest_haid = imgui.ImBool(mainIni.render.rchest_haid)
+local create_object_text = imgui.ImInt(mainIni.settings.create_object_text)
+local combo = imgui.ImInt(mainIni.settings.combo)
+local combo1 = imgui.ImInt(mainIni.settings.combo1)
 
 ------------------------------------------------------
 local rgrove = imgui.ImBool(mainIni.ghetto.rgrove)
@@ -122,7 +139,7 @@ local rpaint = imgui.ImBool(mainIni.ghetto.rpaint)
 local main_window_state = imgui.ImBool(false)
 local sw, sh = getScreenResolution()
 local fa_font = nil
-event_one = true
+--event_one = true
 local fa_glyph_ranges = imgui.ImGlyphRanges({ fa.min_range, fa.max_range })
 
 if not doesFileExist('moonloader/config/MRender.ini') then inicfg.save(mainIni, 'MRender.ini') end
@@ -136,7 +153,8 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 	sampAddChatMessage('[MRender] {D5DEDD}Команда: /'..mainIni.settings.scriptName, 0xFF0000)
 	sampAddChatMessage('[MRender] {D5DEDD}Команда для удаления/cброса конфига: /removeconfig', 0xFF0000)
     if thisScript().version ~= lastver then
-        sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), скачайте обновление в IMGUI-окне', 0xFF0000)
+		update_popup = 1
+		sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), скачайте обновление в IMGUI-окне', 0xFF0000)
     end
 	sampRegisterChatCommand('removeconfig', function()
         os.remove('moonloader\\config\\MRender.ini')
@@ -153,6 +171,28 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 	
 	while true do
         wait(0)
+		if combo.v == 0 then
+			colorObj = '0xFFFF0000' -- Red color
+		    elseif combo.v == 1 then
+			    colorObj = '0xFFFFA500' -- Orange color
+		    elseif combo.v == 2 then
+			    colorObj = '0xFFFFFF00' -- Yellow color
+			elseif combo.v == 3 then
+			    colorObj = '0xFFFFFFFF' -- White color
+			elseif combo.v == 4 then
+			    colorObj = '0xFF00FFFF' -- Blue color
+		end
+		if combo1.v == 0 then
+			linewidth = '1.0'
+		    elseif combo1.v == 1 then
+			    linewidth = '2.0'
+		    elseif combo1.v == 2 then
+			    linewidth = '3.0'
+			elseif combo1.v == 3 then
+				linewidth = '4.0'
+			elseif combo1.v == 4 then
+				linewidth = '5.0'
+		end
 		if selected_item.v == 0 then
 			if isKeyJustPressed(vkey.VK_F12) then
 				main_window_state.v = not main_window_state.v
@@ -294,10 +334,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
                     if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
-						if distanceoff == false then
-							renderFontDrawText(font,' Закладка\n Дистанция: '..distance, wposX, wposY, colorObj)
+						if distanceoff.v == false then
+							renderFontDrawText(font, texto, wposX, wposY, colorObj)
 						elseif distanceoff.v then
-							renderFontDrawText(font,' Закладка', wposX, wposY, colorObj)
+							renderFontDrawText(font, text, wposX, wposY, colorObj)
 						end
                     end
                 end
@@ -511,23 +551,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
 					end
                 end
-				if rchest_haid.v and text:find("Сундук Хайда") then
-                    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-                    local resX, resY = getScreenResolution()
-					if isPointOnScreen (posX,posY,posZ,1) then
-                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
-                    end
-                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
-						if distanceoff.v == false then
-                            renderFontDrawText(font,' Сундук Хайда\n Дистанция: '..distance, wposX, wposY, colorObj)
-                        elseif distanceoff.v then
-							renderFontDrawText(font,' Сундук Хайда', wposX, wposY, colorObj)
-						end
-					end
-                end
-				-------------------------------Свои obj-----------------------------------
+				-------------------------------свои obj-----------------------------------
 				if myObjectOne.v and text:find(u8:decode(nameObjectOne.v)) then 
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
@@ -552,14 +576,61 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					if isPointOnScreen (posX,posY,posZ,1) then
                         renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
                     end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
                         if distanceoff.v == false then
 							renderFontDrawText(font,texto, wposX, wposY, colorObj)
 						elseif distanceoff.v then
 							renderFontDrawText(font,text, wposX, wposY, colorObj)
 						end
                     end
-					--sampAddChatMessage('Координаты льна: X: '..posX..' Y: '..posY..' Z: '..posZ, -1)
+                end
+				if myObjectThree.v and text:find(u8:decode(nameObjectThree.v)) then 
+				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
+                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+                    local resX, resY = getScreenResolution()
+					if isPointOnScreen (posX,posY,posZ,1) then
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
+                        if distanceoff.v == false then
+							renderFontDrawText(font,texto, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
+                    end
+                end
+				if myObjectFour.v and text:find(u8:decode(nameObjectFour.v)) then 
+				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
+                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+                    local resX, resY = getScreenResolution()
+					if isPointOnScreen (posX,posY,posZ,1) then
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
+                        if distanceoff.v == false then
+							renderFontDrawText(font,texto, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
+                    end
+                end
+				if myObjectFive.v and text:find(u8:decode(nameObjectFive.v)) then 
+				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
+                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+                    local resX, resY = getScreenResolution()
+					if isPointOnScreen (posX,posY,posZ,1) then
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
+                        if distanceoff.v == false then
+							renderFontDrawText(font,texto, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,text, wposX, wposY, colorObj)
+						end
+                    end
                 end
 			end
 		end
@@ -569,24 +640,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 	end
 end
 
-
-function currentver()
-    imgui.Text(u8"Обновление не требуется. У вас актуальная версия. Завершаю поиск.")
-	imgui.SameLine()
-	imgui.Spinner("##spinner", 7, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
-end
-
-function installupdate()
-    imgui.Text(u8"Выполняется установка обновлений... Подождите пару секунд...")
-	imgui.SameLine()
-	imgui.Spinner("##spinner", 7, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
-end
-
-function updatesearch()
-	imgui.Text(u8"Выполняется поиск обновлений... Подождите...")
-	imgui.SameLine()
-	imgui.Spinner("##spinner", 7, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
-end
 function key_selection()
 	if selected_item.v == 0 then
 	    imgui.Text(u8"Настройки применены.Для активации скрипта вы выбрали клавишу F12")
@@ -603,23 +656,23 @@ function imgui.OnDrawFrame()
 	if not main_window_state.v then imgui.Process = false end
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-	imgui.SetNextWindowSize(imgui.ImVec2(630, 470), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.8.9(Обновление Halloween, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
-	imgui.BeginChild('##menu', imgui.ImVec2(150, 430), true)
+	imgui.SetNextWindowSize(imgui.ImVec2(650, 470), imgui.Cond.FirstUseEver)
+	imgui.Begin(u8'MRender v1.9.0(Late Winter Update, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.BeginChild('##menu', imgui.ImVec2(150, 440), true)
 	imgui.CenterText(u8'Меню')
-	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 76)) then selected = 1 end
+	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 78)) then selected = 1 end
 	imgui.Separator()
-	if imgui.Button(fa.ICON_FA_SPRAY_CAN .. u8' Рендер граффити', imgui.ImVec2(135, 76)) then selected = 2 end
+	if imgui.Button(fa.ICON_FA_SPRAY_CAN .. u8' Рендер граффити', imgui.ImVec2(135, 78)) then selected = 2 end
 	imgui.Separator()
-	if imgui.Button(fa.ICON_FA_INFO_CIRCLE .. u8' Информация', imgui.ImVec2(135, 76)) then selected = 3 end
+	if imgui.Button(fa.ICON_FA_INFO_CIRCLE .. u8' Информация', imgui.ImVec2(135, 78)) then selected = 3 end
 	imgui.Separator()
-	if imgui.Button(fa.ICON_FA_USER_COG .. u8' Кастомизация', imgui.ImVec2(135, 76)) then selected = 4 end
+	if imgui.Button(fa.ICON_FA_USER_COG .. u8' Кастомизация', imgui.ImVec2(135, 78)) then selected = 4 end
 	imgui.Separator()
-	if imgui.Button(fa.ICON_FA_WRENCH .. u8' Авто-обновление', imgui.ImVec2(135, 52)) then selected = 5 end
+	if imgui.Button(fa.ICON_FA_WRENCH .. u8' Авто-обновление', imgui.ImVec2(135, 55)) then selected = 5 end
 	imgui.EndChild()
 	imgui.SameLine()
 	if selected == 1 then
-		imgui.BeginChild('##render', imgui.ImVec2(460, 430), true)
+		imgui.BeginChild('##render', imgui.ImVec2(480, 440), true)
 		imgui.CenterText(u8'Основное')
 		imgui.Separator()
 		imgui.Checkbox(u8"Лен", rflax)
@@ -630,7 +683,7 @@ function imgui.OnDrawFrame()
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на ресурс хлопок\nПримечание: Рендер срабатывает на грядки хлопка у домов",0)
 		end
-		imgui.Checkbox(u8"Клады", rtreasure)
+		imgui.Checkbox(u8"Клады*", rtreasure)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на клад [Красный чемодан с замком]\nПримечание: Разработчики недавно добавили систему фейк-клада\nБудьте осторожны!",0)
 	    end
@@ -638,15 +691,15 @@ function imgui.OnDrawFrame()
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на закладки",0)
 	    end
-		imgui.Checkbox(u8"Семена", rseeds)
+		imgui.Checkbox(u8"Семена*", rseeds)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на семена наркотиков",0)
 	    end
-		imgui.Checkbox(u8"[NEW!] Олени", rdeer)
+		imgui.Checkbox(u8"Олени", rdeer)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на оленей\nПримечание: Возможны баги из за новых кастомных оленей",0)
 	    end
-		imgui.Checkbox(u8"Руда", rore)
+		imgui.Checkbox(u8"Руда*", rore)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на руду\nПримечание: Рендер не показывает название руд",0)
 	    end
@@ -658,7 +711,7 @@ function imgui.OnDrawFrame()
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на деревья высшего качества",0)
 	    end
-		imgui.Checkbox(u8"Рваная одежда", rclothes)
+		imgui.Checkbox(u8"Рваная одежда*", rclothes)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на рваную одежду",0)
 	    end
@@ -666,7 +719,7 @@ function imgui.OnDrawFrame()
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на грибы",0)
 	    end
-		imgui.Checkbox(u8"Подарки(По карте)", rgift)
+		imgui.Checkbox(u8"Подарки(По карте)*", rgift)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на подарки, которые спавнятся по карте",0)
 	    end
@@ -674,33 +727,75 @@ function imgui.OnDrawFrame()
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на руду, которая находится в подземной шахте",0)
 	    end
-		imgui.Checkbox(u8"[NEW!] Сундук Хайда - Event Halloween 2024", rchest_haid)
-		if clue.v == false then
-		    imgui.Hint(u8"Активирует рендер на сундуки Хайда, которые находятся  в темном лесу",0)
-	    end
+		imgui.Text(u8'Все функции с пометкой * действуют на производительность(Потеря FPS)\nРешение в разработке.')
 		imgui.Separator()
 		imgui.CenterText(u8'Свои объекты(триггеры)')
-		imgui.Checkbox(u8"Свой объект №1", myObjectOne)
-		if clue.v == false then
-		    imgui.Hint(u8"Данный чекбокс позволяет добавить свой кастомный триггер на надпись\nПримечание: Учитывайте регистр надписи",0)
-	    end
-		imgui.Text(u8'Название для obj №1')
+		imgui.Text(u8"Выбери ниже кнопки по которым будет выбираться триггер")
+		if imgui.Button(u8"По тексту") then 
+			razdel = 1
+		end
 		imgui.SameLine()
-		imgui.InputText(u8'##Название объекта для рендера №1', nameObjectOne)
-		if clue.v == false then
-		    imgui.Hint(u8"Напишите сюда текст, на который хотите сделать триггер\nПримечание: Если надпись ALT- то так и пишите ALT",0)
-	    end
-		imgui.Checkbox(u8"Свой объект №2", myObjectTwo)
-		if clue.v == false then
+		if imgui.Button(u8"по ID(временно недоступно!)") then
+			razdel = 2
+		end
+		if razdel == 1 then
+		    imgui.Checkbox(u8"Свой объект №1", myObjectOne)
+		    if clue.v == false then
 		    imgui.Hint(u8"Данный чекбокс позволяет добавить свой кастомный триггер на надпись\nПримечание: Учитывайте регистр надписи",0)
+	        end
+		    imgui.Text(u8'Название для obj №1')
+		    imgui.SameLine()
+		    imgui.InputText(u8'##Название объекта для рендера №1', nameObjectOne)
+		    if clue.v == false then
+				imgui.Hint(u8"Напишите сюда текст, на который хотите сделать триггер\nПримечание: Если надпись ALT- то так и пишите ALT",0)
+			end
+		    imgui.Checkbox(u8"Свой объект №2", myObjectTwo)
+		    if clue.v == false then
+		        imgui.Hint(u8"Данный чекбокс позволяет добавить свой кастомный триггер на надпись\nПримечание: Учитывайте регистр надписи",0)
+	        end
+			if create_object_text.v == 0 then
+				imgui.SameLine()
+			    if imgui.Button(fa.ICON_FA_PLUS .."", imgui.ImVec2(20, 18)) then
+			        create_object_text.v = 1
+			    end
+		    end
+			imgui.Text(u8'Название для obj №2')
+		    imgui.SameLine()
+		    imgui.InputText(u8'##Название объекта для рендера №2', nameObjectTwo)
+			if create_object_text.v == 1 then
+				imgui.Checkbox(u8"Свой объект №3", myObjectThree)
+		        if clue.v == false then
+		            imgui.Hint(u8"Данный чекбокс позволяет добавить свой кастомный триггер на надпись\nПримечание: Учитывайте регистр надписи",0)
+	            end
+				imgui.Text(u8'Название для obj №3')
+		        imgui.SameLine()
+		        imgui.InputText(u8'##Название объекта для рендера №3', nameObjectThree)
+				imgui.Checkbox(u8"Свой объект №4", myObjectFour)
+		        if clue.v == false then
+		            imgui.Hint(u8"Данный чекбокс позволяет добавить свой кастомный триггер на надпись\nПримечание: Учитывайте регистр надписи",0)
+	            end
+				imgui.Text(u8'Название для obj №4')
+		        imgui.SameLine()
+		        imgui.InputText(u8'##Название объекта для рендера №4', nameObjectFour)
+				imgui.Checkbox(u8"Свой объект №5", myObjectFive)
+		        if clue.v == false then
+		            imgui.Hint(u8"Данный чекбокс позволяет добавить свой кастомный триггер на надпись\nПримечание: Учитывайте регистр надписи",0)
+	            end
+				if create_object_text.v == 1 then
+					imgui.SameLine()
+					if imgui.Button(u8"Скрыть до №2") then
+						create_object_text.v = 0
+					end
+				end
+				imgui.Text(u8'Название для obj №5')
+		        imgui.SameLine()
+		        imgui.InputText(u8'##Название объекта для рендера №5', nameObjectFive)
+			end
 	    end
-		imgui.Text(u8'Название для obj №2')
-		imgui.SameLine()
-		imgui.InputText(u8'##Название объекта для рендера №2', nameObjectTwo)
 		saving()
 		imgui.EndChild()
-    elseif selected == 2 then
-		imgui.BeginChild('##getto', imgui.ImVec2(460, 430), true)
+	elseif selected == 2 then
+		imgui.BeginChild('##getto', imgui.ImVec2(480, 440), true)
 		imgui.CenterText(u8'Рендер граффити')
 		imgui.Separator()
 		if imgui.Checkbox(u8"Грув", rgrove) then
@@ -733,7 +828,7 @@ function imgui.OnDrawFrame()
 			    rpaint.v = false
 			end
 		end
-		if imgui.Checkbox(u8"[NEW!] Показать только те граффити, которые доступны для закраски", rpaint) then
+		if imgui.Checkbox(u8"Показать только те граффити, которые доступны для закраски", rpaint) then
 			rgrove.v = false
 			rballas.v = false
 			raztec.v = false
@@ -744,7 +839,7 @@ function imgui.OnDrawFrame()
 		saving()
 		imgui.EndChild()
     elseif selected == 3 then
-		imgui.BeginChild('##information', imgui.ImVec2(460, 430), true)
+		imgui.BeginChild('##information', imgui.ImVec2(480, 440), true)
 		imgui.CenterText(u8'Информация')
 		imgui.Separator()
 		imgui.Link(u8'https://www.blast.hk/members/449591/', u8'Профиль автора на BlastHack')
@@ -756,15 +851,22 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'--[] или кнопку в разделе Кастомизация')
 		imgui.Separator()
         imgui.Text(u8'ВНИМАНИЕ!!!')
-		imgui.Text(u8'При использовании возможны потери FPS до 15%.')
-		imgui.Text(u8'Это связано с обновлением кастомизации')
-		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 6%')
+		imgui.Text(u8'При использовании некоторый функций возможны потери FPS до 15%.')
+		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 7%')
 		imgui.Text(u8'-- При нестабильности работы скрипта обратитесь к автору')
 		imgui.EndChild()
 	elseif selected == 4 then
-		imgui.BeginChild('##settings', imgui.ImVec2(460, 430), true)
+		imgui.BeginChild('##settings', imgui.ImVec2(480, 440), true)
 		imgui.CenterText(u8'Кастомизация')
         imgui.Separator()
+		if imgui.Combo(u8'Цвет текстов рендера', combo, colors) then
+		    mainIni.settings.combo = combo.v
+			inicfg.save(mainIni, "MRender.ini")
+	    end
+		if imgui.Combo(u8'Ширина линии трейсера', combo1, width) then
+		    mainIni.settings.combo1 = combo1.v
+			inicfg.save(mainIni, "MRender.ini")
+	    end
 		imgui.PushItemWidth(150)
 		if imgui.InputText(u8'##Название скрипта', scriptName) then
 			mainIni.settings.scriptName = scriptName.v
@@ -793,54 +895,16 @@ function imgui.OnDrawFrame()
 		    imgui.Hint(u8"Данная кнопка очищает все ваши настройки(ini file)\nПримечание: При нажатии на данную кнопку вы потеряете все свои настройки!",0)
 	    end
 		imgui.Separator()
-		if imgui.Checkbox(u8"[NEW!] Скрыть подсказки", clue) then
+		if imgui.Checkbox(u8"Скрыть подсказки", clue) then
 			mainIni.settings.clue = clue.v
 			inicfg.save(mainIni, "MRender.ini")
 		end
-		--[[система эвента]]
-		if rchest_haid.v and distanceoff.v and event_one == true then
-			if imgui.Button(u8'Не нажимай на меня!', imgui.ImVec2(150,20)) then
-				sampAddChatMessage('{FF0000}[HALLOWEEN 2024) Я же говорил не нажимай!!!', -1)
-				event_one = false
-				event_two = true
-			end
-		end
-		if event_two == true then
-			if imgui.Button(u8'Я же говорю!', imgui.ImVec2(150,20)) then
-				sampAddChatMessage('{FF0000}[HALLOWEEN 2024) Остановись!!!', -1)
-				event_two = false
-				event_three = true
-			end
-		end
-		if event_three == true then
-			if imgui.Button(u8'Нажатие этой кнопки удалит скрипт!', imgui.ImVec2(250,20)) then
-				sampAddChatMessage('{FF0000}[HALLOWEEN 2024) Удаление!!!', -1)
-				event_three = false
-				event_four = true
-			end
-		end
-		if event_four == true then
-			lua_thread.create(function()
-			main_window_state.v = false
-			wait(500)
-			sampAddChatMessage('{FF0000}[HALLOWEEN 2024) config.ini очищен...', -1)
-			wait(1200)
-			sampAddChatMessage('{FF0000}[HALLOWEEN 2024) папка moonloader удалена...', -1)
-			wait(2000)
-			sampAddChatMessage('{FF0000}[HALLOWEEN 2024) папка System32 удалена, перезагрузка системы...', -1)
-			wait(2200)
-			event_four = false
-			sampAddChatMessage('{FF0000}[HALLOWEEN 2024) это всего лишь шутка. :) Спасибо за использование скрипта!', -1)
-			end)
-		end
-		--[[]]
-
-		if imgui.Checkbox(u8"[NEW!] Скрыть отображение дистанции", distanceoff) then
+		if imgui.Checkbox(u8"Скрыть отображение дистанции", distanceoff) then
 			mainIni.settings.distanceoff = distanceoff.v
 			inicfg.save(mainIni, "MRender.ini")
 		end
 		imgui.PushItemWidth(120)
-		if imgui.Combo(u8'[NEW!] Активация скрипта(клавиша)', selected_item, {'F12', 'F2', 'F3'}, 4) then
+		if imgui.Combo(u8'Активация скрипта(клавиша)', selected_item, {'F12', 'F2', 'F3'}, 4) then
 			if selected_item.v == 0 or selected_item.v == 1 or selected_item.v == 2 then
 				lua_thread.create(function()
 					key = true
@@ -856,50 +920,32 @@ function imgui.OnDrawFrame()
 		end
         imgui.PopItemWidth()
 		imgui.CenterText(u8'SOON...NEW FUNCTIONS...')
-		--[[function custom on 1.8.6-1.8.7]]
 		imgui.EndChild()
 	elseif selected == 5 then
-		imgui.BeginChild('##update', imgui.ImVec2(460, 430), true)
+		if update_popup == 1 then
+		    imgui.OpenPopup(u8'Доступно обновление')
+		    if imgui.BeginPopupModal(u8'Доступно обновление', imgui.WindowFlags.NoResize) then
+			    imgui.SetWindowSize(imgui.ImVec2(250, 130))
+			    if imgui.Button(u8'Обновить', imgui.ImVec2(234,50)) then
+					local lastver = update():getLastVersion()
+					if thisScript().version ~= lastver then
+						update():download()
+						update_popup = 2
+					end
+				end
+			    if imgui.Button(u8'Обновить позже!', imgui.ImVec2(234, 24)) then
+				    imgui.CloseCurrentPopup()
+					selected = 1
+			    end
+				imgui.Link('https://t.me/rendersamp', u8'Telegram-канал скрипта')
+		    end
+		    imgui.EndPopup()
+	    end
+		imgui.BeginChild('##update', imgui.ImVec2(480, 440), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
-		if imgui.Button(u8'Загрузить обновление', imgui.ImVec2(140,50)) then
-			local lastver = update():getLastVersion()
-            if thisScript().version ~= lastver then
-			    lua_thread.create(function()
-			        visualsearch = true -- устанавливает поиск обновлений
-			        wait(4000) --делает временную задержку перед остановкой поиска
-			        visualsearch = false -- прекращение поиск обновления
-					wait(1400) -- задержка перед установкой обновления
-					install = true -- выполняется установка обновления
-					wait(6500) -- задержка перед завершением установки
-					install = false -- завершение установки
-                    update():download() -- обновление
-			    end)
-            end
-			if thisScript().version == lastver then
-				lua_thread.create(function()
-			        visualsearch = true
-			        wait(4000)
-			        visualsearch = false
-					wait(1800)
-					currentupdate = true
-					wait(8000)
-					currentupdate = false
-				end)
-			end
-		end
-		if clue.v == false then
-		    imgui.Hint(u8"При нажатии на эту кнопку скрипт проверяет актуальную версию.\nЕсли у вас не последняя версия, то скрипт установит вам актуальную версия.\nЕсли версия совпадает, то ничего не произойдет.",0)
-	    end
-		if visualsearch then
-			updatesearch()
-		end
-		if install then
-			installupdate()
-		end
-		if currentupdate then
-			currentver()
-		end
+		imgui.CenterText(u8'Изменения версии: (v1.9.0)')
+		imgui.Text(u8'- Увеличено количество слотов своих объектов до 5\n(Сo скрытием слотов, Ранее 2)\n- Исправлен баг с отображением дистанции и текста закладок\n- Полностью обновлена система автообновления скрипта\n- Вновь доступна смена цветов текста и трейсера\n- Изменены размеры окна\n- Прочие незначительные изменения')
 		imgui.EndChild()
     end
 	imgui.End()
@@ -997,10 +1043,16 @@ function saving()
 	mainIni.render.rwood =  rwood.v
 	mainIni.render.myObjectOne =  myObjectOne.v
 	mainIni.render.myObjectTwo =  myObjectTwo.v
+	mainIni.render.myObjectThree =  myObjectThree.v
+	mainIni.render.myObjectFour =  myObjectFour.v
+	mainIni.render.myObjectFive =  myObjectFive.v
 	mainIni.render.nameObjectOne = nameObjectOne.v
 	mainIni.render.nameObjectTwo = nameObjectTwo.v
+	mainIni.render.nameObjectThree = nameObjectThree.v
+	mainIni.render.nameObjectFour = nameObjectFour.v
+	mainIni.render.nameObjectFive = nameObjectFive.v
 	mainIni.settings.selected_item = selected_item.v
-	mainIni.render.rchest_haid = rchest_haid.v
+	mainIni.settings.create_object_text_3 = create_object_text.v
     inicfg.save(mainIni, "MRender.ini")
 end
 
@@ -1064,4 +1116,4 @@ function imgui.Hint(text, delay, action)
             imgui.PopStyleVar(2)
         end
     end
-end --[[Функция плавных подсказок by HarlyCloud]]
+end --[[Система плавных подсказок by HarlyCloud]]
