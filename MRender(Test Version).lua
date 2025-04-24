@@ -1,4 +1,4 @@
-script_version('1.9.0')
+script_version('1.9.1')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -69,6 +69,7 @@ local mainIni = inicfg.load({
 		rmushroom = false,
 		rgift = false,
 		rore_underground = false,
+		rcrystal = false,
 	    nameObjectOne = u8'Object name',
 		nameObjectTwo = u8'Object name',
 		nameObjectThree = u8'Object name',
@@ -113,6 +114,7 @@ local myObjectFive = imgui.ImBool(mainIni.render.myObjectFive)
 local rclothes = imgui.ImBool(mainIni.render.rclothes)
 local rmushroom = imgui.ImBool(mainIni.render.rmushroom)
 local rgift= imgui.ImBool(mainIni.render.rgift)
+local rcrystal= imgui.ImBool(mainIni.render.rcrystal)
 local nameObjectOne = imgui.ImBuffer(mainIni.render.nameObjectOne, 256)
 local nameObjectTwo = imgui.ImBuffer(mainIni.render.nameObjectTwo, 256)
 local nameObjectThree = imgui.ImBuffer(mainIni.render.nameObjectThree, 256)
@@ -422,6 +424,22 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
 					end
                 end
+				if rcrystal.v and text:find("Пиксельный кристалл") then
+					local resX, resY = getScreenResolution()
+					local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
+                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+					if isPointOnScreen (posX,posY,posZ,1) then
+					    renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj)
+					end
+                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
+						if distanceoff.v == false then
+                            renderFontDrawText(font,' Пиксельный кристалл\n Дистанция: '..distance, wposX, wposY, colorObj)
+						elseif distanceoff.v then
+							renderFontDrawText(font,' Пиксельный Кристалл', wposX, wposY, colorObj)
+						end
+					end
+                end
 				--банды
 				if rgrove.v and text:find("Банда: {ff6666}{009327}Grove Street") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
@@ -657,7 +675,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(650, 470), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.9.0(Late Winter Update, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.9.1(Easter Update, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 440), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 78)) then selected = 1 end
@@ -723,9 +741,13 @@ function imgui.OnDrawFrame()
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на подарки, которые спавнятся по карте",0)
 	    end
-		imgui.Checkbox(u8"[NEW!] Руда(Подземная шахта)", rore_underground)
+		imgui.Checkbox(u8"Руда(Подземная шахта)", rore_underground)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на руду, которая находится в подземной шахте",0)
+	    end
+		imgui.Checkbox(u8"[Пасха 2025] Пиксельный кристалл", rcrystal)
+		if clue.v == false then
+		    imgui.Hint(u8"Активирует рендер на кристаллы , которые спавнятся на острове",0)
 	    end
 		imgui.Text(u8'Все функции с пометкой * действуют на производительность(Потеря FPS)\nРешение в разработке.')
 		imgui.Separator()
@@ -944,8 +966,8 @@ function imgui.OnDrawFrame()
 		imgui.BeginChild('##update', imgui.ImVec2(480, 440), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
-		imgui.CenterText(u8'Изменения версии: (v1.9.0)')
-		imgui.Text(u8'- Увеличено количество слотов своих объектов до 5\n(Сo скрытием слотов, Ранее 2)\n- Исправлен баг с отображением дистанции и текста закладок\n- Полностью обновлена система автообновления скрипта\n- Вновь доступна смена цветов текста и трейсера\n- Изменены размеры окна\n- Прочие незначительные изменения')
+		imgui.CenterText(u8'Изменения версии: (v1.9.1)')
+		imgui.Text(u8'- Добавлен рендер на пиксельный кристалл')
 		imgui.EndChild()
     end
 	imgui.End()
@@ -1041,6 +1063,7 @@ function saving()
 	mainIni.ghetto.rvagos =  rvagos.v
 	mainIni.ghetto.rpaint =  rpaint.v
 	mainIni.render.rwood =  rwood.v
+	mainIni.render.rcrystal =  rcrystal.v
 	mainIni.render.myObjectOne =  myObjectOne.v
 	mainIni.render.myObjectTwo =  myObjectTwo.v
 	mainIni.render.myObjectThree =  myObjectThree.v
