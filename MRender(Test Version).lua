@@ -1,4 +1,4 @@
-script_version('1.9.1')
+script_version('1.9.2')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -359,7 +359,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
                     end
                 end
-				if rcotton.v and text:find("Хлопок")then
+				if rcotton.v and text:find("Хлопок") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -675,7 +675,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(650, 470), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.9.1(Easter Update, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.9.2(Spring Update, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 440), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 78)) then selected = 1 end
@@ -1140,3 +1140,10 @@ function imgui.Hint(text, delay, action)
         end
     end
 end --[[Система плавных подсказок by HarlyCloud]]
+
+function samp.onCreate3DText(id, color, position, distance, testLOS, attachedPlayerId, attachedVehicleId, text)
+    sampCreate3dTextEx(id, text, color, position.x, position.y, position.z, distance, testLOS, attachedPlayerId, attachedVehicleId)
+end
+function samp.onRemove3DTextLabel(textLabelId)
+    sampDestroy3dText(textLabelId)
+end --[Fix by XRLM (https://www.blast.hk/members/449015/)]]
