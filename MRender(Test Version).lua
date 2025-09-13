@@ -1,4 +1,4 @@
-script_version('1.9.2')
+script_version('1.9.3')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -51,7 +51,6 @@ local razdel = nil
 
 local mainIni = inicfg.load({
 	render = {
-	    rtreasure = false,
 	    rbookmark = false,
 	    rdeer = false,
 	    rflax = false,
@@ -69,7 +68,6 @@ local mainIni = inicfg.load({
 		rmushroom = false,
 		rgift = false,
 		rore_underground = false,
-		rcrystal = false,
 	    nameObjectOne = u8'Object name',
 		nameObjectTwo = u8'Object name',
 		nameObjectThree = u8'Object name',
@@ -96,7 +94,6 @@ local mainIni = inicfg.load({
 	}
 }, 'MRender')
 
-local rtreasure = imgui.ImBool(mainIni.render.rtreasure)
 local rbookmark = imgui.ImBool(mainIni.render.rbookmark)
 local rdeer = imgui.ImBool(mainIni.render.rdeer)
 local rflax = imgui.ImBool(mainIni.render.rflax)
@@ -114,7 +111,6 @@ local myObjectFive = imgui.ImBool(mainIni.render.myObjectFive)
 local rclothes = imgui.ImBool(mainIni.render.rclothes)
 local rmushroom = imgui.ImBool(mainIni.render.rmushroom)
 local rgift= imgui.ImBool(mainIni.render.rgift)
-local rcrystal= imgui.ImBool(mainIni.render.rcrystal)
 local nameObjectOne = imgui.ImBuffer(mainIni.render.nameObjectOne, 256)
 local nameObjectTwo = imgui.ImBuffer(mainIni.render.nameObjectTwo, 256)
 local nameObjectThree = imgui.ImBuffer(mainIni.render.nameObjectThree, 256)
@@ -232,32 +228,9 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 			    end
 		    end
 	    end
-		if rtreasure.v or rseeds.v or rore.v or rclothes.v or rgift.v then -- new test functions optimization
+		if rseeds.v or rore.v or rclothes.v or rgift.v then -- new test functions optimization
 		    for k, v in pairs(getAllObjects()) do
 			    local num = getObjectModel(v)
-			    if isObjectOnScreen(v) and rtreasure.v then
-				    if num == 2680 then
-					    local xp,yp,zp = getCharCoordinates(PLAYER_PED)
-					    local res, px, py, pz = getObjectCoordinates(v)
-					    local wX, wY = convert3DCoordsToScreen(px, py, pz)
-					    distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					    local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					    if getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) > 32 then
-						    if distanceoff.v then
-					            renderFontDrawText(font, ' Клад(Возможно фейк)', wX, wY , colorObj)
-                            elseif distanceoff.v == false then
-							    renderFontDrawText(font, ' Клад(Возможно фейк)\n Дистанция: '..distance, wX, wY , colorObj)
-						    end
-					    elseif getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp) < 32 then
-						    if distanceoff.v then
-					            renderFontDrawText(font, ' Клад', wX, wY , colorObj)
-                            elseif distanceoff.v == false then
-							    renderFontDrawText(font, ' Клад\n Дистанция: '..distance, wX, wY , colorObj)
-						    end
-					    end
-					    renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
-				    end
-			    end
 			if isObjectOnScreen(v) and rseeds.v then
 				if num == 859 then
 					local res, px, py, pz = getObjectCoordinates(v)
@@ -421,22 +394,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
                             renderFontDrawText(font,' Руда(Подземная)\n Дистанция: '..distance, wposX, wposY, colorObj)
 						elseif distanceoff.v then
 							renderFontDrawText(font,' Руда(Подземная)', wposX, wposY, colorObj)
-						end
-					end
-                end
-				if rcrystal.v and text:find("Пиксельный кристалл") then
-					local resX, resY = getScreenResolution()
-					local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
-                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
-                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
-					if isPointOnScreen (posX,posY,posZ,1) then
-					    renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj)
-					end
-                    if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
-						if distanceoff.v == false then
-                            renderFontDrawText(font,' Пиксельный кристалл\n Дистанция: '..distance, wposX, wposY, colorObj)
-						elseif distanceoff.v then
-							renderFontDrawText(font,' Пиксельный Кристалл', wposX, wposY, colorObj)
 						end
 					end
                 end
@@ -675,7 +632,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(650, 470), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.9.2(Spring Update, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'MRender v1.9.3(Autumm Update, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 440), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 78)) then selected = 1 end
@@ -701,10 +658,6 @@ function imgui.OnDrawFrame()
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на ресурс хлопок\nПримечание: Рендер срабатывает на грядки хлопка у домов",0)
 		end
-		imgui.Checkbox(u8"Клады*", rtreasure)
-		if clue.v == false then
-		    imgui.Hint(u8"Активирует рендер на клад [Красный чемодан с замком]\nПримечание: Разработчики недавно добавили систему фейк-клада\nБудьте осторожны!",0)
-	    end
 		imgui.Checkbox(u8"Закладки", rbookmark)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на закладки",0)
@@ -744,10 +697,6 @@ function imgui.OnDrawFrame()
 		imgui.Checkbox(u8"Руда(Подземная шахта)", rore_underground)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на руду, которая находится в подземной шахте",0)
-	    end
-		imgui.Checkbox(u8"[Пасха 2025] Пиксельный кристалл", rcrystal)
-		if clue.v == false then
-		    imgui.Hint(u8"Активирует рендер на кристаллы , которые спавнятся на острове",0)
 	    end
 		imgui.Text(u8'Все функции с пометкой * действуют на производительность(Потеря FPS)\nРешение в разработке.')
 		imgui.Separator()
@@ -966,8 +915,8 @@ function imgui.OnDrawFrame()
 		imgui.BeginChild('##update', imgui.ImVec2(480, 440), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
-		imgui.CenterText(u8'Изменения версии: (v1.9.2)')
-		imgui.Text(u8'- Исправлен рендер на текста')
+		imgui.CenterText(u8'Изменения версии: (v1.9.3)')
+		imgui.Text(u8'- Удалены рендеры на клады и пиксельный кристалл, в связи с неактуально\nстью.')
 		imgui.EndChild()
     end
 	imgui.End()
@@ -1043,7 +992,6 @@ end
 apply_custom_style()
 
 function saving()
-    mainIni.render.rtreasure = rtreasure.v
 	mainIni.render.rbookmark = rbookmark.v
 	mainIni.render.rgift = rgift.v
 	mainIni.render.rdeer = rdeer.v
@@ -1063,7 +1011,6 @@ function saving()
 	mainIni.ghetto.rvagos =  rvagos.v
 	mainIni.ghetto.rpaint =  rpaint.v
 	mainIni.render.rwood =  rwood.v
-	mainIni.render.rcrystal =  rcrystal.v
 	mainIni.render.myObjectOne =  myObjectOne.v
 	mainIni.render.myObjectTwo =  myObjectTwo.v
 	mainIni.render.myObjectThree =  myObjectThree.v
