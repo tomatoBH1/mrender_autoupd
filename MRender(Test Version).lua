@@ -1,4 +1,4 @@
-script_version('1.9.3')
+script_version('1.9.4')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -632,7 +632,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(650, 470), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'MRender v1.9.3(Autumm Update, с автообновлением)', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'(скоро на Mimgui) MRender v1.9.4 с автообновлением', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 440), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 78)) then selected = 1 end
@@ -701,15 +701,6 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'Все функции с пометкой * действуют на производительность(Потеря FPS)\nРешение в разработке.')
 		imgui.Separator()
 		imgui.CenterText(u8'Свои объекты(триггеры)')
-		imgui.Text(u8"Выбери ниже кнопки по которым будет выбираться триггер")
-		if imgui.Button(u8"По тексту") then 
-			razdel = 1
-		end
-		imgui.SameLine()
-		if imgui.Button(u8"по ID(временно недоступно!)") then
-			razdel = 2
-		end
-		if razdel == 1 then
 		    imgui.Checkbox(u8"Свой объект №1", myObjectOne)
 		    if clue.v == false then
 		    imgui.Hint(u8"Данный чекбокс позволяет добавить свой кастомный триггер на надпись\nПримечание: Учитывайте регистр надписи",0)
@@ -762,7 +753,6 @@ function imgui.OnDrawFrame()
 		        imgui.SameLine()
 		        imgui.InputText(u8'##Название объекта для рендера №5', nameObjectFive)
 			end
-	    end
 		saving()
 		imgui.EndChild()
 	elseif selected == 2 then
@@ -915,8 +905,10 @@ function imgui.OnDrawFrame()
 		imgui.BeginChild('##update', imgui.ImVec2(480, 440), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
-		imgui.CenterText(u8'Изменения версии: (v1.9.3)')
-		imgui.Text(u8'- Удалены рендеры на клады и пиксельный кристалл, в связи с неактуально\nстью.')
+		imgui.CenterText(u8'Изменения версии: (v1.9.4)')
+		imgui.Text(u8'- Удалена вкладка с рендером объектов по ID, больше в ней нет\n необходимости')
+		imgui.Text(u8'- В ближайших обновлениях планируется переход интерфейса на MIMGUI')
+		imgui.Text(u8'- Подробнее в телеграм канале...')
 		imgui.EndChild()
     end
 	imgui.End()
