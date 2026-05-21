@@ -1,4 +1,4 @@
-script_version('1.9.4')
+script_version('1.9.5')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -246,21 +246,6 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
 				end
 			end
-            if isObjectOnScreen(v) and rore.v then
-				if num == 854 then
-					local res, px, py, pz = getObjectCoordinates(v)
-					local wX, wY = convert3DCoordsToScreen(px, py, pz)
-					local xp,yp,zp = getCharCoordinates(PLAYER_PED)
-					local myPosX, myPosY = convert3DCoordsToScreen(getCharCoordinates(PLAYER_PED))
-					distance = string.format("%.0fм", getDistanceBetweenCoords3d(px,py,pz,xp,yp,zp))
-					if distanceoff.v then
-						renderFontDrawText(font, ' Руда', wX, wY , colorObj)
-					elseif distanceoff.v == false then
-						renderFontDrawText(font, ' Руда\n Дистанция: '..distance, wX, wY , colorObj)
-					end
-					renderDrawLine(myPosX, myPosY, wX, wY, linewidth, colorObj)
-				end
-			end
 			if isObjectOnScreen(v) and rclothes.v then
 				if num == 18893 or num == 2844 or num == 2819 or num == 18919 or num == 18974 or num == 18946 or num == 2705 or num == 2706 then
 					local res, px, py, pz = getObjectCoordinates(v)
@@ -398,7 +383,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					end
                 end
 				--банды
-				if rgrove.v and text:find("Банда: {ff6666}{009327}Grove Street") then
+				if rgrove.v and text:find("Банда: {90EE90}{009327}Grove Street") then
                     local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -414,7 +399,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
                     end
                 end
-				if rballas.v and text:find("Банда: {ff6666}{CC00CC}East Side Ballas") then
+				if rballas.v and text:find("Банда: {90EE90}{CC00CC}East Side Ballas") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -430,7 +415,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
                     end
                 end
-			    if rrifa.v and text:find("Банда: {ff6666}{6666FF}The Rifa") then
+			    if rrifa.v and text:find("Банда: {90EE90}{6666FF}The Rifa") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -446,7 +431,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
                     end
                 end
-				if raztec.v and text:find("Банда: {ff6666}{00FFE2}Varrios Los Aztecas") then
+				if raztec.v and text:find("Банда: {90EE90}{00FFE2}Varrios Los Aztecas") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -462,7 +447,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
                     end
                 end
-				if rNightWolves.v and text:find("Банда: {ff6666}{A87878}Night Wolves") then
+				if rNightWolves.v and text:find("Банда: {90EE90}{A87878}Night Wolves") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -478,7 +463,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
                     end
                 end
-				if rvagos.v and text:find("Банда: {ff6666}{D1DB1C}Los Santos Vagos") and text:find('Повторно закрасить можно через:') then
+				if rvagos.v and text:find("Банда: {90EE90}{D1DB1C}Los Santos Vagos") then
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
                     x2,y2,z2 = getCharCoordinates(PLAYER_PED)
                     x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
@@ -526,6 +511,22 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 						end
 					end
                 end
+				if rore.v and text:find('Месторождение ресурсов') then
+					local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
+                    x2,y2,z2 = getCharCoordinates(PLAYER_PED)
+                    x10, y10 = convert3DCoordsToScreen(x2,y2,z2)
+                    local resX, resY = getScreenResolution()
+					if isPointOnScreen (posX,posY,posZ,1) then
+                        renderDrawLine(x10, y10, wposX, wposY, linewidth, colorObj) 
+                    end
+                    if wposX < resX and wposY < resY and isPointOnScreen(posX,posY,posZ,1) then
+						if distanceoff.v == false then
+                            renderFontDrawText(font,' Руда\n Дистанция: '..distance, wposX, wposY, colorObj)
+                        elseif distanceoff.v then
+							renderFontDrawText(font,' Руда', wposX, wposY, colorObj)
+						end
+					end
+                end
 				-------------------------------свои obj-----------------------------------
 				if myObjectOne.v and text:find(u8:decode(nameObjectOne.v)) then 
 				    local wposX, wposY = convert3DCoordsToScreen(posX,posY,posZ)
@@ -538,8 +539,10 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
                         if distanceoff.v == false then
 							renderFontDrawText(font,texto, wposX, wposY, colorObj)
+							sampAddChatMessage(text, -1)
 						elseif distanceoff.v then
 							renderFontDrawText(font,text, wposX, wposY, colorObj)
+							sampAddChatMessage(text, -1)
 						end
                     end
                 end
@@ -632,7 +635,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(650, 470), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'(скоро на Mimgui) MRender v1.9.4 с автообновлением', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'(MIMGUI soon...) MRender v1.9.5 с автообновлением', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 440), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 78)) then selected = 1 end
@@ -668,9 +671,9 @@ function imgui.OnDrawFrame()
 	    end
 		imgui.Checkbox(u8"Олени", rdeer)
 		if clue.v == false then
-		    imgui.Hint(u8"Активирует рендер на оленей\nПримечание: Возможны баги из за новых кастомных оленей",0)
+		    imgui.Hint(u8"Активирует рендер на оленей",0)
 	    end
-		imgui.Checkbox(u8"Руда*", rore)
+		imgui.Checkbox(u8"Руда", rore)
 		if clue.v == false then
 		    imgui.Hint(u8"Активирует рендер на руду\nПримечание: Рендер не показывает название руд",0)
 	    end
@@ -789,14 +792,14 @@ function imgui.OnDrawFrame()
 			    rpaint.v = false
 			end
 		end
-		if imgui.Checkbox(u8"Показать только те граффити, которые доступны для закраски", rpaint) then
+		--[[if imgui.Checkbox(u8"Показать только те граффити, которые доступны для закраски", rpaint) then
 			rgrove.v = false
 			rballas.v = false
 			raztec.v = false
 			rNightWolves.v = false
 			rvagos.v = false
-			rrifa.v = false--[[Система блокировки лишних граффити]]
-		end
+			rrifa.v = false--[[Система блокировки лишних граффити
+		end]]
 		saving()
 		imgui.EndChild()
     elseif selected == 3 then
@@ -812,8 +815,8 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'--[] или кнопку в разделе Кастомизация')
 		imgui.Separator()
         imgui.Text(u8'ВНИМАНИЕ!!!')
-		imgui.Text(u8'При использовании некоторый функций возможны потери FPS до 15%.')
-		imgui.Text(u8'Также при открытии скрипта возможны потери fps до 7%')
+		imgui.Text(u8'При использовании некоторый функций возможны потери кадров в секунду до 13%.')
+		imgui.Text(u8'Также при открытии скрипта возможны потери кадров в секунду до 6%')
 		imgui.Text(u8'-- При нестабильности работы скрипта обратитесь к автору')
 		imgui.EndChild()
 	elseif selected == 4 then
@@ -905,8 +908,9 @@ function imgui.OnDrawFrame()
 		imgui.BeginChild('##update', imgui.ImVec2(480, 440), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
-		imgui.CenterText(u8'Изменения версии: (v1.9.4)')
-		imgui.Text(u8'- Удалена вкладка с рендером объектов по ID, больше в ней нет\n необходимости')
+		imgui.CenterText(u8'Изменения версии: (v1.9.5)')
+		imgui.Text(u8'- Исправлен рендер на граффити, также удалена\n функция отображение граффити уже доступных для закраски')
+		imgui.Text(u8'- Рендер на руду теперь триггерится на текст, вместо 854 id объекта\n | by https://www.blast.hk/members/594923/')
 		imgui.Text(u8'- В ближайших обновлениях планируется переход интерфейса на MIMGUI')
 		imgui.Text(u8'- Подробнее в телеграм канале...')
 		imgui.EndChild()
