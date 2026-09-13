@@ -1,4 +1,4 @@
-script_version('1.9.5')
+script_version('1.9.6')
 
 function update()
     local raw = 'https://raw.githubusercontent.com/tomatoBH1/mrender_autoupd/main/update.json'
@@ -92,7 +92,7 @@ local mainIni = inicfg.load({
 		combo = 3,
 	    combo1 = 2,
 	}
-}, 'MRender')
+}, 'MRender/MRender.ini')
 
 local rbookmark = imgui.ImBool(mainIni.render.rbookmark)
 local rdeer = imgui.ImBool(mainIni.render.rdeer)
@@ -140,14 +140,14 @@ local fa_font = nil
 --event_one = true
 local fa_glyph_ranges = imgui.ImGlyphRanges({ fa.min_range, fa.max_range })
 
-if not doesFileExist('moonloader/config/MRender.ini') then inicfg.save(mainIni, 'MRender.ini') end
+if not doesFileExist('moonloader/config/MRender/MRender.ini') then inicfg.save(mainIni, 'MRender/MRender.ini') end
 
 function main()
 if not isSampLoaded() or not isSampfuncsLoaded() then return end
     while not isSampAvailable() do wait(100) end
     
 	local lastver = update():getLastVersion()
-    sampAddChatMessage('[MRender] {D5DEDD}Скрипт загружен, версия: '..lastver, 0xFF0000)
+    sampAddChatMessage('[MRender] {D5DEDD}Скрипт загружен, версия: '..thisScript().version, 0xFF0000)
 	sampAddChatMessage('[MRender] {D5DEDD}Команда: /'..mainIni.settings.scriptName, 0xFF0000)
 	sampAddChatMessage('[MRender] {D5DEDD}Команда для удаления/cброса конфига: /removeconfig', 0xFF0000)
     if thisScript().version ~= lastver then
@@ -155,7 +155,7 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 		sampAddChatMessage('Вышло обновление скрипта ('..thisScript().version..' -> '..lastver..'), скачайте обновление в IMGUI-окне', 0xFF0000)
     end
 	sampRegisterChatCommand('removeconfig', function()
-        os.remove('moonloader\\config\\MRender.ini')
+        os.remove('moonloader\\config\\MRender\\MRender.ini')
 		thisScript():reload()
 		sampAddChatMessage('[MRender] {D5DEDD}Конфиг скрипта сброшен!', 0xFF0000)
     end)
@@ -539,10 +539,8 @@ if not isSampLoaded() or not isSampfuncsLoaded() then return end
 					if wposX < resX and wposY < resY and isPointOnScreen (posX,posY,posZ,1) then
                         if distanceoff.v == false then
 							renderFontDrawText(font,texto, wposX, wposY, colorObj)
-							sampAddChatMessage(text, -1)
 						elseif distanceoff.v then
 							renderFontDrawText(font,text, wposX, wposY, colorObj)
-							sampAddChatMessage(text, -1)
 						end
                     end
                 end
@@ -635,7 +633,7 @@ function imgui.OnDrawFrame()
 	if main_window_state.v then
 	imgui.SetNextWindowPos(imgui.ImVec2(sw/2, sh/2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
 	imgui.SetNextWindowSize(imgui.ImVec2(650, 470), imgui.Cond.FirstUseEver)
-	imgui.Begin(u8'(MIMGUI soon...) MRender v1.9.5 с автообновлением', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
+	imgui.Begin(u8'(MIMGUI soon...) MRender v1.9.6 с автообновлением', main_window_state, imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoResize)
 	imgui.BeginChild('##menu', imgui.ImVec2(150, 440), true)
 	imgui.CenterText(u8'Меню')
 	if imgui.Button(fa.ICON_FA_BOOK_READER .. u8' Рендер', imgui.ImVec2(135, 78)) then selected = 1 end
@@ -792,14 +790,6 @@ function imgui.OnDrawFrame()
 			    rpaint.v = false
 			end
 		end
-		--[[if imgui.Checkbox(u8"Показать только те граффити, которые доступны для закраски", rpaint) then
-			rgrove.v = false
-			rballas.v = false
-			raztec.v = false
-			rNightWolves.v = false
-			rvagos.v = false
-			rrifa.v = false--[[Система блокировки лишних граффити
-		end]]
 		saving()
 		imgui.EndChild()
     elseif selected == 3 then
@@ -815,8 +805,6 @@ function imgui.OnDrawFrame()
 		imgui.Text(u8'--[] или кнопку в разделе Кастомизация')
 		imgui.Separator()
         imgui.Text(u8'ВНИМАНИЕ!!!')
-		imgui.Text(u8'При использовании некоторый функций возможны потери кадров в секунду до 13%.')
-		imgui.Text(u8'Также при открытии скрипта возможны потери кадров в секунду до 6%')
 		imgui.Text(u8'-- При нестабильности работы скрипта обратитесь к автору')
 		imgui.EndChild()
 	elseif selected == 4 then
@@ -825,16 +813,16 @@ function imgui.OnDrawFrame()
         imgui.Separator()
 		if imgui.Combo(u8'Цвет текстов рендера', combo, colors) then
 		    mainIni.settings.combo = combo.v
-			inicfg.save(mainIni, "MRender.ini")
+			inicfg.save(mainIni, "MRender/MRender.ini")
 	    end
 		if imgui.Combo(u8'Ширина линии трейсера', combo1, width) then
 		    mainIni.settings.combo1 = combo1.v
-			inicfg.save(mainIni, "MRender.ini")
+			inicfg.save(mainIni, "MRender/MRender.ini")
 	    end
 		imgui.PushItemWidth(150)
 		if imgui.InputText(u8'##Название скрипта', scriptName) then
 			mainIni.settings.scriptName = scriptName.v
-			inicfg.save(mainIni, "MRender.ini")
+			inicfg.save(mainIni, "MRender/MRender.ini")
 		end
 		imgui.PopItemWidth()
 		imgui.SameLine()
@@ -851,7 +839,7 @@ function imgui.OnDrawFrame()
 	    end
 		imgui.SameLine()
 		if imgui.Button(u8'Сбросить конфиг', imgui.ImVec2(115,36)) then
-			os.remove('moonloader\\config\\MRender.ini')
+			os.remove('moonloader\\config\\MRender\\MRender.ini')
 		    thisScript():reload()
 		    sampAddChatMessage('[MRender] {D5DEDD}Конфиг скрипта сброшен!', 0xFF0000)
 		end
@@ -861,11 +849,11 @@ function imgui.OnDrawFrame()
 		imgui.Separator()
 		if imgui.Checkbox(u8"Скрыть подсказки", clue) then
 			mainIni.settings.clue = clue.v
-			inicfg.save(mainIni, "MRender.ini")
+			inicfg.save(mainIni, "MRender/MRender.ini")
 		end
 		if imgui.Checkbox(u8"Скрыть отображение дистанции", distanceoff) then
 			mainIni.settings.distanceoff = distanceoff.v
-			inicfg.save(mainIni, "MRender.ini")
+			inicfg.save(mainIni, "MRender/MRender.ini")
 		end
 		imgui.PushItemWidth(120)
 		if imgui.Combo(u8'Активация скрипта(клавиша)', selected_item, {'F12', 'F2', 'F3'}, 4) then
@@ -877,7 +865,7 @@ function imgui.OnDrawFrame()
 			    end)
 			end
 			mainIni.settings.selected_item = selected_item.v
-			inicfg.save(mainIni, "MRender.ini")
+			inicfg.save(mainIni, "MRender/MRender.ini")
 		end
 		if key then
 			key_selection()
@@ -887,17 +875,17 @@ function imgui.OnDrawFrame()
 		imgui.EndChild()
 	elseif selected == 5 then
 		if update_popup == 1 then
-		    imgui.OpenPopup(u8'Доступно обновление')
-		    if imgui.BeginPopupModal(u8'Доступно обновление', imgui.WindowFlags.NoResize) then
+		    imgui.OpenPopup(u8'Доступен апдейт')
+		    if imgui.BeginPopupModal(u8'Доступен апдейт', imgui.WindowFlags.NoResize) then
 			    imgui.SetWindowSize(imgui.ImVec2(250, 130))
-			    if imgui.Button(u8'Обновить', imgui.ImVec2(234,50)) then
+			    if imgui.Button(u8'[Рекомендуем] Обновить сейчас', imgui.ImVec2(234,50)) then
 					local lastver = update():getLastVersion()
 					if thisScript().version ~= lastver then
 						update():download()
 						update_popup = 2
 					end
 				end
-			    if imgui.Button(u8'Обновить позже!', imgui.ImVec2(234, 24)) then
+			    if imgui.Button(u8'Обновиться позже', imgui.ImVec2(234, 24)) then
 				    imgui.CloseCurrentPopup()
 					selected = 1
 			    end
@@ -908,9 +896,11 @@ function imgui.OnDrawFrame()
 		imgui.BeginChild('##update', imgui.ImVec2(480, 440), true)
 		imgui.CenterText(u8'Авто-обновление')
         imgui.Separator()
-		imgui.CenterText(u8'Изменения версии: (v1.9.5)')
-		imgui.Text(u8'- Исправлен рендер на граффити, также удалена\n функция отображение граффити уже доступных для закраски')
-		imgui.Text(u8'- Рендер на руду теперь триггерится на текст, вместо 854 id объекта\n | by https://www.blast.hk/members/594923/')
+		imgui.CenterText(u8'Изменения версии: (v1.9.6)')
+		imgui.Text(u8'- Исправлен рендер на граффити')
+		imgui.Text(u8'- Удален лишний спам текста при включении рендера своих объектов')
+		imgui.Text(u8'- Немного переделаны/удалены текста в окнах')
+		imgui.Text(u8'- Теперь файл сохранения INI находится в отдельной папке скрипта')
 		imgui.Text(u8'- В ближайших обновлениях планируется переход интерфейса на MIMGUI')
 		imgui.Text(u8'- Подробнее в телеграм канале...')
 		imgui.EndChild()
@@ -1019,7 +1009,7 @@ function saving()
 	mainIni.render.nameObjectFive = nameObjectFive.v
 	mainIni.settings.selected_item = selected_item.v
 	mainIni.settings.create_object_text_3 = create_object_text.v
-    inicfg.save(mainIni, "MRender.ini")
+    inicfg.save(mainIni, "MRender/MRender.ini")
 end
 
 function imgui.CenterText(text)
@@ -1090,3 +1080,31 @@ end
 function samp.onRemove3DTextLabel(textLabelId)
     sampDestroy3dText(textLabelId)
 end --[Fix by XRLM (https://www.blast.hk/members/449015/)]]
+
+
+--[[DEBUG_LOW]]
+--[[Готовится система оповещений]]
+
+--[[function FileCheckRender()
+    lua_thread.create(function()
+        if not doesDirectoryExist('moonloader/config/MRender') then
+            createDirectory('moonloader/config/MRender')
+        end
+
+        local mp3_download = {
+            [1] = ''
+        }
+
+        for i = 1, 10 do
+            downloadFile('moonloader/config/MRender/'..i..'.mp3', mp3_download[i])
+            wait(100)
+        end
+    end)
+end
+
+function downloadFile(path, link)
+	if not doesFileExist(path) then
+		downloadUrlToFile(link, path, function(id, status, p1, p2)
+		end)
+	end
+end]]
